@@ -4,9 +4,9 @@ import numpy as np
 import pytest
 from pkg_resources import resource_filename
 
-from pyscenic.genesig import GeneSignature
-from pyscenic.recovery import enrichment4features as enrichment, auc1d, weighted_auc1d, rcc2d
-from pyscenic.rnkdb import FeatherRankingDatabase as RankingDatabase
+from pycistarget_core.genesig import GeneSignature
+from pycistarget_core.recovery import enrichment4features as enrichment, auc1d, weighted_auc1d, rcc2d
+from pycistarget_core.rnkdb import FeatherRankingDatabase as RankingDatabase
 
 TEST_DATABASE_FNAME = resource_filename('resources.tests', "hg19-tss-centered-10kb-10species.mc9nr.feather")
 TEST_DATABASE_NAME = "hg19-tss-centered-10kb-10species.mc9nr"
