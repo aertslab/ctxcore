@@ -13,8 +13,10 @@ TEST_SIGNATURE_FNAME = resource_filename('resources.tests', "c6.all.v6.1.symbols
 ##################################################
 # temporarily disable testing of the parqet databases until we have a working test database
 from os import path
+
 pytestmark = pytest.mark.skipif(not path.exists(TEST_DATABASE_FNAME), reason="Parquet testing is temporarily disabled.")
 ##################################################
+
 
 @pytest.fixture
 def db():
@@ -23,7 +25,11 @@ def db():
 
 @pytest.fixture
 def gs():
-    return GeneSignature.from_gmt(TEST_SIGNATURE_FNAME, gene_separator="\t", field_separator="\t", )[0]
+    return GeneSignature.from_gmt(
+        TEST_SIGNATURE_FNAME,
+        gene_separator="\t",
+        field_separator="\t",
+    )[0]
 
 
 def test_init(db):

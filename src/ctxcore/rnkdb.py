@@ -1,18 +1,17 @@
 # -*- coding: utf-8 -*-
 
 import os
-import numpy as np
-import pandas as pd
-import pyarrow as pa
-import pyarrow.parquet as pq
 import sqlite3
-
 from abc import ABCMeta, abstractmethod
 from operator import itemgetter
 from typing import Dict, Set, Tuple, Type
 
+import numpy as np
+import pandas as pd
+import pyarrow as pa
+import pyarrow.parquet as pq
 from cytoolz import memoize
-from pyarrow.feather import write_feather, FeatherReader
+from pyarrow.feather import FeatherReader, write_feather
 from tqdm import tqdm
 
 from .genesig import GeneSignature

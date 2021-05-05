@@ -5,7 +5,9 @@ import pytest
 from pkg_resources import resource_filename
 
 from ctxcore.genesig import GeneSignature
-from ctxcore.recovery import enrichment4features as enrichment, auc1d, weighted_auc1d, rcc2d
+from ctxcore.recovery import auc1d
+from ctxcore.recovery import enrichment4features as enrichment
+from ctxcore.recovery import rcc2d, weighted_auc1d
 from ctxcore.rnkdb import FeatherRankingDatabase as RankingDatabase
 
 TEST_DATABASE_FNAME = resource_filename('resources.tests', "hg19-tss-centered-10kb-10species.mc9nr.feather")
@@ -15,12 +17,19 @@ TEST_SIGNATURE_FNAME = resource_filename('resources.tests', "c6.all.v6.1.symbols
 
 @pytest.fixture
 def db():
-    return RankingDatabase(TEST_DATABASE_FNAME, TEST_DATABASE_NAME, )
+    return RankingDatabase(
+        TEST_DATABASE_FNAME,
+        TEST_DATABASE_NAME,
+    )
 
 
 @pytest.fixture
 def gs():
-    return GeneSignature.from_gmt(TEST_SIGNATURE_FNAME, gene_separator="\t", field_separator="\t", )[0]
+    return GeneSignature.from_gmt(
+        TEST_SIGNATURE_FNAME,
+        gene_separator="\t",
+        field_separator="\t",
+    )[0]
 
 
 def test_enrichment(db, gs):
@@ -81,8 +90,9 @@ def test_weighted_auc1d_batch():
         weights = np.ones(n_genes)
         # Disable normalization.
         auc_max = 1.0
-        assert auc1d(ranking, auc_rank_threshold, auc_max) \
-               == weighted_auc1d(ranking, weights, auc_rank_threshold, auc_max)
+        assert auc1d(ranking, auc_rank_threshold, auc_max) == weighted_auc1d(
+            ranking, weights, auc_rank_threshold, auc_max
+        )
 
 
 def test_weighted_rcc2d_batch():
@@ -102,5 +112,6 @@ def test_weighted_rcc2d_batch():
         weights = np.ones(n_genes)
         # Disable normalization.
         auc_max = 1.0
-        assert rcc2d(rankings, np.insert(weights, len(weights), 0.0), total_genes)[:, :auc_rank_threshold].sum(axis=1) \
-               == weighted_auc1d(ranking, weights, auc_rank_threshold, auc_max)
+        assert rcc2d(rankings, np.insert(weights, len(weights), 0.0), total_genes)[:, :auc_rank_threshold].sum(
+            axis=1
+        ) == weighted_auc1d(ranking, weights, auc_rank_threshold, auc_max)

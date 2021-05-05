@@ -18,7 +18,11 @@ def db():
 
 @pytest.fixture
 def gs():
-    return GeneSignature.from_gmt(TEST_SIGNATURE_FNAME, gene_separator="\t", field_separator="\t", )[0]
+    return GeneSignature.from_gmt(
+        TEST_SIGNATURE_FNAME,
+        gene_separator="\t",
+        field_separator="\t",
+    )[0]
 
 
 def test_init(db):

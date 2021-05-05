@@ -9,8 +9,8 @@
 import os
 import re
 import sys
-import sphinx_rtd_theme
 
+import sphinx_rtd_theme
 from sphinx.ext import apidoc
 
 # sys.path.insert(0, os.path.abspath('.'))

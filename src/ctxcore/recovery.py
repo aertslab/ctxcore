@@ -1,15 +1,15 @@
 # -*- coding: utf-8 -*-
 
-import pandas as pd
-import numpy as np
-from itertools import repeat
-from typing import Type, Optional, List, Tuple
-from numba import jit
 import logging
+from itertools import repeat
+from typing import List, Optional, Tuple, Type
 
-from .rnkdb import RankingDatabase
+import numpy as np
+import pandas as pd
+from numba import jit
+
 from .genesig import GeneSignature, Regulon
-
+from .rnkdb import RankingDatabase
 
 __all__ = ["recovery", "aucs", "enrichment4features", "enrichment4cells", "leading_edge4row"]
 

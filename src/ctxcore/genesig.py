@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 
-import re
+import gzip
 import os
+import re
 from collections.abc import Iterable, Mapping
-from itertools import repeat
-from typing import Mapping, List, FrozenSet, Type
+from itertools import chain, repeat
+from typing import FrozenSet, List, Mapping, Type
 
 import attr
 import yaml
-from cytoolz import merge_with, dissoc, keyfilter, first, second
+from cytoolz import dissoc, first, keyfilter, memoize, merge, merge_with, second
 from frozendict import frozendict
-from itertools import chain
-import gzip
-from cytoolz import memoize, merge
 
 
 def convert(genes):
