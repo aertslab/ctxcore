@@ -17,14 +17,14 @@ rejected.
 The workflow that developers typically use to fix a bug or add enhancements
 is as follows.
 
-* Fork the ``pycistarget_core`` repo into your account.
+* Fork the ``ctxcore`` repo into your account.
 
 * Obtain the source by cloning it onto your development machine.
 
   .. code-block:: console
 
-      $ git clone git@github.com:your_name_here/pycistarget_core.git
-      $ cd pycistarget_core
+      $ git clone git@github.com:your_name_here/ctxcore.git
+      $ cd ctxcore
 
 * Create a branch for local development:
 
@@ -48,7 +48,7 @@ is as follows.
 
       $ make venv
       $ source venv/bin/activate
-      (pycistarget_core) $
+      (ctxcore) $
 
   The 'venv' directory is is created under the project root directory and is
   also listed in the '.gitignore' file so that its contents never accidentally
@@ -56,7 +56,7 @@ is as follows.
 
   .. note::
 
-      (pycistarget_core) is used to indicate when the commands
+      (ctxcore) is used to indicate when the commands
       should be run within the virtual environment containing the development
       dependencies.
 
@@ -72,7 +72,7 @@ is as follows.
 
     .. code-block:: console
 
-        (pycistarget_core) $ make test
+        (ctxcore) $ make test
 
     See the :ref:`testing-label` section for more information on testing.
 
@@ -80,7 +80,7 @@ is as follows.
 
     .. code-block:: console
 
-        (pycistarget_core) $ make coverage
+        (ctxcore) $ make coverage
 
     Review the output produced in ``docs/source/_static/coverage/coverage.html``.
     Add additional test steps, where practical, to improve coverage.
@@ -89,7 +89,7 @@ is as follows.
 
     .. code-block:: console
 
-        (pycistarget_core) $ make check-style
+        (ctxcore) $ make check-style
 
     Run 'make style' to automatically apply style fixes if needed. See the
     :ref:`style-compliance-label` section for more information.
@@ -99,7 +99,7 @@ is as follows.
 
     .. code-block:: console
 
-        (pycistarget_core) $ make check-static-analysis
+        (ctxcore) $ make check-static-analysis
 
     See the :ref:`static-analysis-label` section for more information.
 
@@ -110,7 +110,7 @@ is as follows.
 
     .. code-block:: console
 
-        (pycistarget_core) $ make docs
+        (ctxcore) $ make docs
 
   See the :ref:`documentation-label` section for more information.
 

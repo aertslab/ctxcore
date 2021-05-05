@@ -1,15 +1,15 @@
 import unittest
 
-import pycistarget_core
+import ctxcore
 
 
 class VersionTestCase(unittest.TestCase):
     """Version tests"""
 
     def test_version(self):
-        """check pycistarget_core exposes a version attribute"""
-        self.assertTrue(hasattr(pycistarget_core, "__version__"))
-        self.assertIsInstance(pycistarget_core.__version__, str)
+        """check ctxcore exposes a version attribute"""
+        self.assertTrue(hasattr(ctxcore, "__version__"))
+        self.assertIsInstance(ctxcore.__version__, str)
 
 
 if __name__ == "__main__":

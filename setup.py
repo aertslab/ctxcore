@@ -5,10 +5,10 @@ from setuptools import find_packages, setup
 
 regexp = re.compile(r'.*__version__ = [\'\"](.*?)[\'\"]', re.S)
 
-base_package = 'pycistarget_core'
+base_package = 'ctxcore'
 base_path = os.path.dirname(__file__)
 
-init_file = os.path.join(base_path, 'src', 'pycistarget_core', '__init__.py')
+init_file = os.path.join(base_path, 'src', 'ctxcore', '__init__.py')
 with open(init_file, 'r') as f:
     module_content = f.read()
 
@@ -40,17 +40,17 @@ requirements = parse_requirements('requirements.txt')
 
 if __name__ == '__main__':
     setup(
-        name='pycistarget_core',
+        name='ctxcore',
         description='Core functions for pycisTarget and the SCENIC tool suite',
         long_description='\n\n'.join([readme, changes]),
         license='GNU General Public License v3',
-        url='https://github.com/aertslab/pycistarget_core',
+        url='https://github.com/aertslab/ctxcore',
         version=version,
         author='Bram Van de Sande',
         maintainer='Christopher Flerin',
         maintainer_email='christopher.flerin@kuleuven.be',
         install_requires=requirements,
-        keywords=['pycistarget_core'],
+        keywords=['ctxcore','cisTarget','pycisTarget','SCENIC','pySCENIC'],
         package_dir={'': 'src'},
         packages=find_packages('src'),
         zip_safe=False,

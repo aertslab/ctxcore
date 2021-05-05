@@ -1,5 +1,5 @@
-pycisTarget_core
-################
+ctxcore
+#######
 
 Core functions for pycisTarget and the SCENIC tool suite
 
@@ -7,19 +7,19 @@ Core functions for pycisTarget and the SCENIC tool suite
 Quickstart
 ==========
 
-pycisTarget_core is available on PyPI and can be installed with `pip <https://pip.pypa.io>`_.
+ctxcore is available on PyPI and can be installed with `pip <https://pip.pypa.io>`_.
 
 .. code-block:: console
 
-    $ pip install pycistarget_core
+    $ pip install ctxcore
 
-After installing pycisTarget_core you can use it like any other Python module.
+After installing ctxcore you can use it like any other Python module.
 
 Here is a simple example:
 
 .. code-block:: python
 
-    import pycistarget_core
+    import ctxcore
     # Fill this section in with the common use-case.
 
-The `API Reference <http://pycistarget_core.readthedocs.io>`_ provides API-level documentation.
+The `API Reference <http://ctxcore.readthedocs.io>`_ provides API-level documentation.

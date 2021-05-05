@@ -3,8 +3,8 @@
 import pytest
 from pkg_resources import resource_filename
 
-from pycistarget_core.genesig import GeneSignature
-from pycistarget_core.rnkdb import FeatherRankingDatabase as RankingDatabase
+from ctxcore.genesig import GeneSignature
+from ctxcore.rnkdb import FeatherRankingDatabase as RankingDatabase
 
 TEST_DATABASE_FNAME = resource_filename('resources.tests', "hg19-tss-centered-10kb-10species.mc9nr.feather")
 TEST_DATABASE_NAME = "hg19-tss-centered-10kb-10species.mc9nr"

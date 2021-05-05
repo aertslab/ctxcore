@@ -1,4 +1,4 @@
-.. pycisTarget_core documentation master file
+.. ctxcore documentation master file
 
 .. toctree::
    :maxdepth: 2

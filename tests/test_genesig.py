@@ -4,7 +4,7 @@ import attr
 import pytest
 from pkg_resources import resource_filename
 
-from pycistarget_core.genesig import GeneSignature, Regulon
+from ctxcore.genesig import GeneSignature, Regulon
 
 TEST_SIGNATURE = "msigdb_cancer_c6"
 TEST_SIGNATURE_FNAME = resource_filename('resources.tests', "c6.all.v6.1.symbols.gmt")
