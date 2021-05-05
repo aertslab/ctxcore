@@ -1,0 +1,9 @@
+black
+coverage
+isort
+mypy
+pylint
+pytest
+sphinx
+twine
+wheel
