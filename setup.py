@@ -1,23 +1,6 @@
 import os
-import re
 
 from setuptools import find_packages, setup
-
-regexp = re.compile(r'.*__version__ = [\'\"](.*?)[\'\"]', re.S)
-
-base_package = 'ctxcore'
-base_path = os.path.dirname(__file__)
-
-init_file = os.path.join(base_path, 'src', 'ctxcore', '__init__.py')
-with open(init_file, 'r') as f:
-    module_content = f.read()
-
-    match = regexp.match(module_content)
-    if match:
-        version = match.group(1)
-    else:
-        raise RuntimeError(
-            'Cannot find __version__ in {}'.format(init_file))
 
 with open('README.rst', 'r') as f:
     readme = f.read()
@@ -41,11 +24,12 @@ requirements = parse_requirements('requirements.txt')
 if __name__ == '__main__':
     setup(
         name='ctxcore',
+        use_scm_version=True,
+        setup_requires=['setuptools_scm'],
         description='Core functions for pycisTarget and the SCENIC tool suite',
         long_description='\n\n'.join([readme, changes]),
         license='GNU General Public License v3',
         url='https://github.com/aertslab/ctxcore',
-        version=version,
         author='Bram Van de Sande',
         maintainer='Christopher Flerin',
         maintainer_email='christopher.flerin@kuleuven.be',
