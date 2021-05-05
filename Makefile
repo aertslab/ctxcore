@@ -54,13 +54,13 @@ coverage:
 # help: format                         - perform code style format
 .PHONY: format
 format:
-	@black -l 120 -S src/ctxcore tests examples
+	@black -l 120 -S src/ctxcore tests
 
 
 # help: check-format                   - check code format compliance
 .PHONY: check-format
 check-format:
-	@black --check src/ctxcore tests examples
+	@black --check src/ctxcore tests
 
 
 # help: sort-imports                   - apply import sort ordering
@@ -94,7 +94,7 @@ check-types:
 # help: check-lint                     - run static analysis checks
 .PHONY: check-lint
 check-lint:
-	@pylint --rcfile=.pylintrc ctxcore ./tests setup.py ./examples
+	@pylint --rcfile=.pylintrc ctxcore ./tests setup.py
 
 
 # help: check-static-analysis          - check code style compliance
