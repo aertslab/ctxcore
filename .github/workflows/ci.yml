@@ -37,9 +37,9 @@ jobs:
     - name: Check code style
       run: |
         make check-style
-    - name: Check static analysis
-      run: |
-        make check-static-analysis
+    #- name: Check static analysis
+    #  run: |
+    #    make check-static-analysis
     - name: Install package
       run: |
         pip install .

@@ -60,7 +60,7 @@ format:
 # help: check-format                   - check code format compliance
 .PHONY: check-format
 check-format:
-	@black --check src/ctxcore tests
+	@black -l 120 -S  --check src/ctxcore tests
 
 
 # help: sort-imports                   - apply import sort ordering
