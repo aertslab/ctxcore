@@ -35,6 +35,7 @@ if __name__ == '__main__':
         maintainer_email='christopher.flerin@kuleuven.be',
         install_requires=requirements,
         keywords=['ctxcore','cisTarget','pycisTarget','SCENIC','pySCENIC'],
+        include_package_data=True,
         package_dir={'': 'src'},
         packages=find_packages('src'),
         zip_safe=False,
