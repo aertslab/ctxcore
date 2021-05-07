@@ -258,9 +258,6 @@ class SQLiteRankingDatabase(RankingDatabase):
         return pd.DataFrame(index=self.features, columns=genes, data=rankings)
 
 
-INDEX_NAME = "features"
-
-
 class FeatherRankingDatabase(RankingDatabase):
     def __init__(self, fname: str, name: str):
         """
@@ -272,13 +269,24 @@ class FeatherRankingDatabase(RankingDatabase):
         super().__init__(name=name)
 
         assert os.path.isfile(fname), "Database {0:s} doesn't exist.".format(fname)
+
         # FeatherReader cannot be pickle (important for dask framework) so filename is field instead.
         self._fname = fname
+
+        if fname.endswith('.genes_vs_motifs.rankings.feather') or fname.endswith('.regions_vs_motifs.rankings.feather'):
+            self._index_name = 'motifs'
+        elif fname.endswith('.genes_vs_tracks.rankings.feather') or fname.endswith(
+            'regions_vs_tracks.rankings.feather'
+        ):
+            self._index_name = 'tracks'
+        else:
+            self._index_name = 'features'
 
     @property
     @memoize
     def total_genes(self) -> int:
-        # Do not count column 1 as it contains the index with the name of the features.
+        # Do not count column 1 as it contains the index with the name of the index column ("motifs", "tracks" or
+        # "features").
         return FeatherReader(self._fname).num_columns - 1
 
     @property
@@ -286,11 +294,11 @@ class FeatherRankingDatabase(RankingDatabase):
     def genes(self) -> Tuple[str]:
         # noinspection PyTypeChecker
         reader = FeatherReader(self._fname)
-        # Get all gene names (exclude "features" column).
+        # Get all gene names (exclude index column: "motifs", "tracks" or "features").
         return tuple(
             reader.get_column_name(idx)
             for idx in range(reader.num_columns)
-            if reader.get_column_name(idx) != INDEX_NAME
+            if reader.get_column_name(idx) != self._index_name
         )
 
     @property
@@ -302,7 +310,7 @@ class FeatherRankingDatabase(RankingDatabase):
         df = FeatherReader(self._fname).read_pandas()
         # Avoid copying the whole dataframe by replacing the index in place.
         # This makes loading a database twice as fast in case the database file is already in the filesystem cache.
-        df.set_index(INDEX_NAME, inplace=True)
+        df.set_index(self._index_name, inplace=True)
         return df
 
     def load(self, gs: Type[GeneSignature]) -> pd.DataFrame:
@@ -310,12 +318,15 @@ class FeatherRankingDatabase(RankingDatabase):
         gene_set = self.geneset.intersection(set(gs.genes))
         # Read ranking columns for genes in order they appear in the Feather file.
         df = FeatherReader(self._fname).read_pandas(
-            columns=(INDEX_NAME,) + tuple(sorted(gene_set, key=lambda gene: self.genes2idx[gene]))
+            columns=(self._index_name,) + tuple(sorted(gene_set, key=lambda gene: self.genes2idx[gene]))
         )
         # Avoid copying the whole dataframe by replacing the index in place.
         # This makes loading a database twice as fast in case the database file is already in the filesystem cache.
-        df.set_index(INDEX_NAME, inplace=True)
+        df.set_index(self._index_name, inplace=True)
         return df
+
+
+INDEX_NAME = "features"
 
 
 class ParquetRankingDatabase(RankingDatabase):
