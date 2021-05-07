@@ -5,6 +5,14 @@ ctxcore
 
 Core functions for pycisTarget and the SCENIC tool suite
 
+----
+
+ctxcore is part of the SCENIC Suite of tools! 
+See the main `SCENIC website <https://scenic.aertslab.org/>`_ for additional information and a full list of tools available.
+
+----
+
+
 
 Quickstart
 ==========
