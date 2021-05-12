@@ -273,11 +273,17 @@ class FeatherRankingDatabase(RankingDatabase):
         # FeatherReader cannot be pickle (important for dask framework) so filename is field instead.
         self._fname = fname
 
-        if fname.endswith('.genes_vs_motifs.rankings.feather') or fname.endswith('.regions_vs_motifs.rankings.feather'):
+        if fname.endswith(
+            '.genes_vs_motifs.rankings.feather') or fname.endswith(
+            '.regions_vs_motifs.rankings.feather') or fname.endswith(
+            '.genes_vs_motifs.scores.feather') or fname.endswith(
+            '.regions_vs_motifs.scores.feather'):
             self._index_name = 'motifs'
-        elif fname.endswith('.genes_vs_tracks.rankings.feather') or fname.endswith(
-            'regions_vs_tracks.rankings.feather'
-        ):
+        elif fname.endswith(
+            '.genes_vs_tracks.rankings.feather') or fname.endswith(
+            '.regions_vs_tracks.rankings.feather') or fname.endswith(
+            '.genes_vs_tracks.scores.feather') or fname.endswith(
+            '.regions_vs_tracks.scores.feather'):
             self._index_name = 'tracks'
         else:
             self._index_name = 'features'
