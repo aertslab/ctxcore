@@ -256,6 +256,12 @@ class RegionOrGeneIDs:
     def __len__(self) -> int:
         return len(self.ids)
 
+    def __getitem__(self, items) -> "RegionOrGeneIDs":
+        if isinstance(items, int):
+            return RegionOrGeneIDs((self.ids[items], ), self.type)
+
+        return RegionOrGeneIDs(self.ids[items], self.type)
+
     def difference(self, other: "RegionOrGeneIDs") -> "RegionOrGeneIDs":
         """
         Get which region or gene IDs in the current RegionOrGeneIDs object are not present in the other RegionOrGeneIDs
@@ -419,6 +425,12 @@ class MotifOrTrackIDs:
 
     def __len__(self) -> int:
         return len(self.ids)
+
+    def __getitem__(self, items) -> "MotifOrTrackIDs":
+        if isinstance(items, int):
+            return MotifOrTrackIDs((self.ids[items], ), self.type)
+
+        return MotifOrTrackIDs(self.ids[items], self.type)
 
     def sort(self) -> "MotifOrTrackIDs":
         """
