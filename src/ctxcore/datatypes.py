@@ -244,8 +244,14 @@ class RegionOrGeneIDs:
         self.ids_set = set(self.ids_dict)
         self.type = regions_or_genes_type
 
+    def __str__(self) -> str:
+        return f"RegionOrGeneIDs(\n" \
+               f"    region_or_gene_ids={self.ids if len(self.ids) <= 6 else self.ids[0:6] + ('...',)},\n" \
+               f"    regions_or_genes_type={self.type}\n" \
+               ")"
+
     def __repr__(self) -> str:
-        return f"RegionOrGeneIDs(\n  region_or_gene_ids={self.ids},\n  regions_or_genes_type={self.type}\n)"
+        return f"RegionOrGeneIDs(\n    region_or_gene_ids={self.ids},\n    regions_or_genes_type={self.type}\n)"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, RegionOrGeneIDs):
@@ -414,8 +420,14 @@ class MotifOrTrackIDs:
         self.ids_set = set(self.ids_dict)
         self.type = motifs_or_tracks_type
 
+    def __str__(self) -> str:
+        return f"MotifOrTrackIDs(\n" \
+               f"    motif_or_track_ids={self.ids if len(self.ids) <= 6 else self.ids[0:6] + ('...',)},\n" \
+               f"    motifs_or_tracks_type={self.type}\n" \
+               ")"
+
     def __repr__(self) -> str:
-        return f"MotifOrTrackIDs(\n  motif_or_track_ids={self.ids},\n  motifs_or_tracks_type={self.type}\n)"
+        return f"MotifOrTrackIDs(\n    motif_or_track_ids={self.ids},\n    motifs_or_tracks_type={self.type}\n)"
 
     def __eq__(self, other: object) -> bool:
         if not isinstance(other, MotifOrTrackIDs):
