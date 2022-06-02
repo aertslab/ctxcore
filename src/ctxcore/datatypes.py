@@ -449,3 +449,9 @@ class MotifOrTrackIDs:
         Sort motif IDs or track IDs.
         """
         return MotifOrTrackIDs(sorted(self.ids), self.type)
+
+    def has_motifs(self) -> bool:
+        return self.type == MotifsOrTracksType.MOTIFS
+
+    def has_tracks(self) -> bool:
+        return self.type == MotifsOrTracksType.TRACKS
