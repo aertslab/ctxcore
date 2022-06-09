@@ -122,7 +122,7 @@ class RankingDatabase(metaclass=ABCMeta):
         """
         Returns a unambiguous string representation.
         """
-        return "{}(name=\"{}\")".format(self.__class__.__name__, self._name)
+        return '{}(name="{}")'.format(self.__class__.__name__, self._name)
 
 
 class FeatherRankingDatabase(RankingDatabase):
@@ -140,8 +140,7 @@ class FeatherRankingDatabase(RankingDatabase):
         # FeatherReader cannot be pickle (important for dask framework) so filename is field instead.
         self._fname = fname
         self.ct_db = CisTargetDatabase.init_ct_db(
-            ct_db_filename=self._fname,
-            engine="pyarrow"
+            ct_db_filename=self._fname, engine="pyarrow"
         )
 
     @property
@@ -155,7 +154,9 @@ class FeatherRankingDatabase(RankingDatabase):
         return self.ct_db.all_region_or_gene_ids.ids
 
     def load_full(self) -> pd.DataFrame:
-        return self.ct_db.subset_to_pandas(region_or_gene_ids=self.ct_db.all_region_or_gene_ids)
+        return self.ct_db.subset_to_pandas(
+            region_or_gene_ids=self.ct_db.all_region_or_gene_ids
+        )
 
     def load(self, gs: Type[GeneSignature]) -> pd.DataFrame:
         # For some genes in the signature there might not be a rank available in the database.
@@ -164,7 +165,7 @@ class FeatherRankingDatabase(RankingDatabase):
         return self.ct_db.subset_to_pandas(
             region_or_gene_ids=RegionOrGeneIDs(
                 region_or_gene_ids=gene_set,
-                regions_or_genes_type=self.ct_db.all_region_or_gene_ids.type
+                regions_or_genes_type=self.ct_db.all_region_or_gene_ids.type,
             )
         )
 
@@ -195,7 +196,7 @@ class MemoryDecorator(RankingDatabase):
         return self._df.loc[:, self._df.columns.isin(gs.genes)]
 
 
-def opendb(fname: str, name: str) -> Type['RankingDatabase']:
+def opendb(fname: str, name: str) -> Type["RankingDatabase"]:
     """
     Open a ranking database.
 
