@@ -25,8 +25,8 @@ def convert(genes):
         return frozendict(zip(genes, repeat(1.0)))
 
 
-def openfile(filename, mode='r'):
-    if filename.endswith('.gz'):
+def openfile(filename, mode="r"):
+    if filename.endswith(".gz"):
         return gzip.open(filename, mode)
     else:
         return open(filename, mode)
@@ -38,20 +38,28 @@ class GeneSignature(yaml.YAMLObject):
     A class of gene signatures, i.e. a set of genes that are biologically related.
     """
 
-    yaml_tag = u'!GeneSignature'
+    yaml_tag = "!GeneSignature"
 
     @classmethod
     def to_yaml(cls, dumper, data):
-        dict_representation = {'name': data.name, 'genes': list(data.genes), 'weights': list(data.weights)}
+        dict_representation = {
+            "name": data.name,
+            "genes": list(data.genes),
+            "weights": list(data.weights),
+        }
         return dumper.represent_mapping(cls.yaml_tag, dict_representation, cls)
 
     @classmethod
     def from_yaml(cls, loader, node):
         data = loader.construct_mapping(node, cls)
-        return GeneSignature(name=data['name'], gene2weight=zip(data['genes'], data['weights']))
+        return GeneSignature(
+            name=data["name"], gene2weight=zip(data["genes"], data["weights"])
+        )
 
     @classmethod
-    def from_gmt(cls, fname: str, field_separator: str = '\t', gene_separator: str = '\t') -> List['GeneSignature']:
+    def from_gmt(
+        cls, fname: str, field_separator: str = "\t", gene_separator: str = "\t"
+    ) -> List["GeneSignature"]:
         """
         Load gene signatures from a GMT file.
 
@@ -80,9 +88,9 @@ class GeneSignature(yaml.YAMLObject):
     def to_gmt(
         cls,
         fname: str,
-        signatures: List[Type['GeneSignature']],
-        field_separator: str = '\t',
-        gene_separator: str = '\t',
+        signatures: List[Type["GeneSignature"]],
+        field_separator: str = "\t",
+        gene_separator: str = "\t",
     ) -> None:
         """
         Save list of signatures as GMT file.
@@ -98,12 +106,16 @@ class GeneSignature(yaml.YAMLObject):
                 genes = gene_separator.join(signature.genes)
                 file.write(
                     "{}{}{}{}{}\n".format(
-                        signature.name, field_separator, signature.metadata(','), field_separator, genes
+                        signature.name,
+                        field_separator,
+                        signature.metadata(","),
+                        field_separator,
+                        genes,
                     )
                 )
 
     @classmethod
-    def from_grp(cls, fname, name: str) -> 'GeneSignature':
+    def from_grp(cls, fname, name: str) -> "GeneSignature":
         """
         Load gene signature from GRP file.
 
@@ -115,11 +127,16 @@ class GeneSignature(yaml.YAMLObject):
         assert os.path.exists(fname), "{} does not exist.".format(fname)
         with openfile(fname, "r") as file:
             return GeneSignature(
-                name=name, gene2weight=[line.rstrip() for line in file if not line.startswith("#") and line.strip()]
+                name=name,
+                gene2weight=[
+                    line.rstrip()
+                    for line in file
+                    if not line.startswith("#") and line.strip()
+                ],
             )
 
     @classmethod
-    def from_rnk(cls, fname: str, name: str, field_separator=",") -> 'GeneSignature':
+    def from_rnk(cls, fname: str, name: str, field_separator=",") -> "GeneSignature":
         """
         Reads in a signature from an RNK file. This format associates weights with the genes part of the signature.
 
@@ -161,7 +178,9 @@ class GeneSignature(yaml.YAMLObject):
         """
         Return genes in this signature. Genes are sorted in descending order according to weight.
         """
-        return tuple(map(first, sorted(self.gene2weight.items(), key=second, reverse=True)))
+        return tuple(
+            map(first, sorted(self.gene2weight.items(), key=second, reverse=True))
+        )
 
     @property
     @memoize
@@ -169,7 +188,9 @@ class GeneSignature(yaml.YAMLObject):
         """
         Return the weights of the genes in this signature. Genes are sorted in descending order according to weight.
         """
-        return tuple(map(second, sorted(self.gene2weight.items(), key=second, reverse=True)))
+        return tuple(
+            map(second, sorted(self.gene2weight.items(), key=second, reverse=True))
+        )
 
     def metadata(self, field_separator: str = ",") -> str:
         """
@@ -181,17 +202,17 @@ class GeneSignature(yaml.YAMLObject):
         """
         return ""
 
-    def copy(self, **kwargs) -> Type['GeneSignature']:
+    def copy(self, **kwargs) -> Type["GeneSignature"]:
         # noinspection PyTypeChecker
         try:
             return GeneSignature(**merge(vars(self), kwargs))
         except TypeError:
             # Pickled gene signatures might still have nomenclature property.
             args = merge(vars(self), kwargs)
-            del args['nomenclature']
+            del args["nomenclature"]
             return GeneSignature(**args)
 
-    def rename(self, name: str) -> Type['GeneSignature']:
+    def rename(self, name: str) -> Type["GeneSignature"]:
         """
         Rename this signature.
 
@@ -200,16 +221,18 @@ class GeneSignature(yaml.YAMLObject):
         """
         return self.copy(name=name)
 
-    def add(self, gene_symbol, weight=1.0) -> Type['GeneSignature']:
+    def add(self, gene_symbol, weight=1.0) -> Type["GeneSignature"]:
         """
         Add an extra gene symbol to this signature.
         :param gene_symbol: The symbol of the gene.
         :param weight: The weight.
         :return: the new :class:`GeneSignature` instance.
         """
-        return self.copy(gene2weight=list(chain(self.gene2weight.items(), [(gene_symbol, weight)])))
+        return self.copy(
+            gene2weight=list(chain(self.gene2weight.items(), [(gene_symbol, weight)]))
+        )
 
-    def union(self, other: Type['GeneSignature']) -> Type['GeneSignature']:
+    def union(self, other: Type["GeneSignature"]) -> Type["GeneSignature"]:
         """
         Creates a new :class:`GeneSignature` instance which is the union of this signature and the other supplied
         signature.
@@ -220,11 +243,15 @@ class GeneSignature(yaml.YAMLObject):
         :return: the new :class:`GeneSignature` instance.
         """
         return self.copy(
-            name="({} | {})".format(self.name, other.name) if self.name != other.name else self.name,
-            gene2weight=frozendict(merge_with(max, self.gene2weight, other.gene2weight)),
+            name="({} | {})".format(self.name, other.name)
+            if self.name != other.name
+            else self.name,
+            gene2weight=frozendict(
+                merge_with(max, self.gene2weight, other.gene2weight)
+            ),
         )
 
-    def difference(self, other: Type['GeneSignature']) -> Type['GeneSignature']:
+    def difference(self, other: Type["GeneSignature"]) -> Type["GeneSignature"]:
         """
         Creates a new :class:`GeneSignature` instance which is the difference of this signature and the supplied other
         signature.
@@ -235,11 +262,13 @@ class GeneSignature(yaml.YAMLObject):
         :return: the new :class:`GeneSignature` instance.
         """
         return self.copy(
-            name="({} - {})".format(self.name, other.name) if self.name != other.name else self.name,
+            name="({} - {})".format(self.name, other.name)
+            if self.name != other.name
+            else self.name,
             gene2weight=frozendict(dissoc(dict(self.gene2weight), *other.genes)),
         )
 
-    def intersection(self, other: Type['GeneSignature']) -> Type['GeneSignature']:
+    def intersection(self, other: Type["GeneSignature"]) -> Type["GeneSignature"]:
         """
         Creates a new :class:`GeneSignature` instance which is the intersection of this signature and the supplied other
         signature.
@@ -251,9 +280,14 @@ class GeneSignature(yaml.YAMLObject):
         """
         genes = set(self.gene2weight.keys()).intersection(set(other.gene2weight.keys()))
         return self.copy(
-            name="({} & {})".format(self.name, other.name) if self.name != other.name else self.name,
+            name="({} & {})".format(self.name, other.name)
+            if self.name != other.name
+            else self.name,
             gene2weight=frozendict(
-                keyfilter(lambda k: k in genes, merge_with(max, self.gene2weight, other.gene2weight))
+                keyfilter(
+                    lambda k: k in genes,
+                    merge_with(max, self.gene2weight, other.gene2weight),
+                )
             ),
         )
 
@@ -263,15 +297,17 @@ class GeneSignature(yaml.YAMLObject):
         """
         return self.copy(gene2weight=self.genes)
 
-    def head(self, n: int = 5) -> Type['GeneSignature']:
+    def head(self, n: int = 5) -> Type["GeneSignature"]:
         """
         Returns a gene signature with only the top n targets.
         """
         assert n >= 1, "n must be greater than or equal to one."
-        genes = self.genes[0:n]  # Genes are sorted in ascending order according to weight.
+        genes = self.genes[
+            0:n
+        ]  # Genes are sorted in ascending order according to weight.
         return self.copy(gene2weight=keyfilter(lambda k: k in genes, self.gene2weight))
 
-    def jaccard_index(self, other: Type['GeneSignature']) -> float:
+    def jaccard_index(self, other: Type["GeneSignature"]) -> float:
         """
         Calculate the symmetrical similarity metric between this and another signature.
         The JI is a value between 0.0 and 1.0.
@@ -308,10 +344,16 @@ class GeneSignature(yaml.YAMLObject):
         """
         Returns an unambiguous string representation.
         """
-        return "{}(name=\"{}\",gene2weight=[{}])".format(
+        return '{}(name="{}",gene2weight=[{}])'.format(
             self.__class__.__name__,
             self.name,
-            "[" + ",".join(map(lambda g, w: "(\"{}\",{})".format(g, w), zip(self.genes, self.weights))) + "]",
+            "["
+            + ",".join(
+                map(
+                    lambda g, w: '("{}",{})'.format(g, w), zip(self.genes, self.weights)
+                )
+            )
+            + "]",
         )
 
 
@@ -322,17 +364,17 @@ class Regulon(GeneSignature, yaml.YAMLObject):
     a subnetwork of a larger Gene Regulatory Network (GRN) connecting a TF with its target genes.
     """
 
-    yaml_tag = u'!Regulon'
+    yaml_tag = "!Regulon"
 
     @classmethod
     def to_yaml(cls, dumper, data):
         dict_representation = {
-            'name': data.name,
-            'genes': list(data.genes),
-            'weights': list(data.weights),
-            'score': data.score,
-            'context': list(data.context),
-            'transcription_factor': data.transcription_factor,
+            "name": data.name,
+            "genes": list(data.genes),
+            "weights": list(data.weights),
+            "score": data.score,
+            "context": list(data.context),
+            "transcription_factor": data.transcription_factor,
         }
         return dumper.represent_mapping(cls.yaml_tag, dict_representation, cls)
 
@@ -340,11 +382,11 @@ class Regulon(GeneSignature, yaml.YAMLObject):
     def from_yaml(cls, loader, node):
         data = loader.construct_mapping(node, cls)
         return Regulon(
-            name=data['name'],
-            gene2weight=list(zip(data['genes'], data['weights'])),
-            score=data['score'],
-            context=frozenset(data['context']),
-            transcription_factor=data['transcription_factor'],
+            name=data["name"],
+            gene2weight=list(zip(data["genes"], data["weights"])),
+            score=data["score"],
+            context=frozenset(data["context"]),
+            transcription_factor=data["transcription_factor"],
         )
 
     gene2occurrence = attr.ib(converter=convert)  # Mapping[str, float]
@@ -354,63 +396,65 @@ class Regulon(GeneSignature, yaml.YAMLObject):
     nes = attr.ib(default=0.0)  # float
     orthologous_identity = attr.ib(default=0.0)  # float
     similarity_qvalue = attr.ib(default=0.0)  # float
-    annotation = attr.ib(default='')  # str
+    annotation = attr.ib(default="")  # str
 
     @transcription_factor.validator
     def non_empty(self, attribute, value):
         if len(value) == 0:
             raise ValueError("A regulon must have a transcription factor.")
 
-    def metadata(self, field_separator: str = ',') -> str:
-        return "tf={}{}score={}".format(self.transcription_factor, field_separator, self.score)
+    def metadata(self, field_separator: str = ",") -> str:
+        return "tf={}{}score={}".format(
+            self.transcription_factor, field_separator, self.score
+        )
 
-    def copy(self, **kwargs) -> 'Regulon':
+    def copy(self, **kwargs) -> "Regulon":
         try:
             return Regulon(**merge(vars(self), kwargs))
         except TypeError:
             # Pickled regulons might still have nomenclature property.
             args = merge(vars(self), kwargs)
-            del args['nomenclature']
+            del args["nomenclature"]
             return Regulon(**args)
 
-    def union(self, other: Type['GeneSignature']) -> 'Regulon':
+    def union(self, other: Type["GeneSignature"]) -> "Regulon":
         assert self.transcription_factor == getattr(
-            other, 'transcription_factor', self.transcription_factor
+            other, "transcription_factor", self.transcription_factor
         ), "Union of two regulons is only possible when same factor."
         # noinspection PyTypeChecker
         return (
             super()
             .union(other)
             .copy(
-                context=self.context.union(getattr(other, 'context', frozenset())),
-                score=max(self.score, getattr(other, 'score', 0.0)),
+                context=self.context.union(getattr(other, "context", frozenset())),
+                score=max(self.score, getattr(other, "score", 0.0)),
             )
         )
 
-    def difference(self, other: Type['GeneSignature']) -> 'Regulon':
+    def difference(self, other: Type["GeneSignature"]) -> "Regulon":
         assert self.transcription_factor == getattr(
-            other, 'transcription_factor', self.transcription_factor
+            other, "transcription_factor", self.transcription_factor
         ), "Difference of two regulons is only possible when same factor."
         # noinspection PyTypeChecker
         return (
             super()
             .difference(other)
             .copy(
-                context=self.context.union(getattr(other, 'context', frozenset())),
-                score=max(self.score, getattr(other, 'score', 0.0)),
+                context=self.context.union(getattr(other, "context", frozenset())),
+                score=max(self.score, getattr(other, "score", 0.0)),
             )
         )
 
-    def intersection(self, other: Type['GeneSignature']) -> 'Regulon':
+    def intersection(self, other: Type["GeneSignature"]) -> "Regulon":
         assert self.transcription_factor == getattr(
-            other, 'transcription_factor', self.transcription_factor
+            other, "transcription_factor", self.transcription_factor
         ), "Intersection of two regulons is only possible when same factor."
         # noinspection PyTypeChecker
         return (
             super()
             .intersection(other)
             .copy(
-                context=self.context.union(getattr(other, 'context', frozenset())),
-                score=max(self.score, getattr(other, 'score', 0.0)),
+                context=self.context.union(getattr(other, "context", frozenset())),
+                score=max(self.score, getattr(other, "score", 0.0)),
             )
         )
