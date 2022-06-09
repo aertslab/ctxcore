@@ -2,7 +2,7 @@
 
 import re
 from pathlib import Path
-from typing import Literal, Optional, Tuple, Union, Type
+from typing import Literal, Optional, Tuple, Type, Union
 
 import numpy as np
 import pandas as pd
@@ -10,12 +10,11 @@ import polars as pl
 import pyarrow as pa
 import pyarrow.dataset as ds
 import pyarrow.feather as pf
-
 from datatypes import (
-    RegionsOrGenesType,
-    RegionOrGeneIDs,
-    MotifsOrTracksType,
     MotifOrTrackIDs,
+    MotifsOrTracksType,
+    RegionOrGeneIDs,
+    RegionsOrGenesType,
     ScoresOrRankingsType,
 )
 
@@ -645,7 +644,7 @@ class CisTargetDatabase:
         region_or_gene_ids: RegionOrGeneIDs,
         engine: Optional[
             Union[str, Literal["polars"], Literal["polars_pyarrow"], Literal["pyarrow"]]
-        ],
+        ] = None,
         sort: bool = False,
     ):
         """
@@ -705,7 +704,7 @@ class CisTargetDatabase:
         region_or_gene_ids: RegionOrGeneIDs,
         engine: Optional[
             Union[str, Literal["polars"], Literal["polars_pyarrow"], Literal["pyarrow"]]
-        ],
+        ] = None,
     ):
         """
         Create Pandas dataframe of scores or rankings for input region IDs or gene IDs from cisTarget database file.
