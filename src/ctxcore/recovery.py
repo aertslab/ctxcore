@@ -8,8 +8,8 @@ import numpy as np
 import pandas as pd
 from numba import jit
 
-from .genesig import GeneSignature, Regulon
-from .rnkdb import RankingDatabase
+from ctxcore.genesig import GeneSignature, Regulon
+from ctxcore.rnkdb import RankingDatabase
 
 __all__ = [
     "recovery",

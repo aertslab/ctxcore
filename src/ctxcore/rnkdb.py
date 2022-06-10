@@ -6,11 +6,11 @@ from typing import Set, Tuple, Type
 
 import pandas as pd
 import pyarrow as pa
-from ctdb import CisTargetDatabase
 from cytoolz import memoize
-from datatypes import RegionOrGeneIDs
 
-from .genesig import GeneSignature
+from ctxcore.ctdb import CisTargetDatabase
+from ctxcore.datatypes import RegionOrGeneIDs
+from ctxcore.genesig import GeneSignature
 
 
 class PyArrowThreads:

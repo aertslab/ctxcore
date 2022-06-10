@@ -10,7 +10,8 @@ import polars as pl
 import pyarrow as pa
 import pyarrow.dataset as ds
 import pyarrow.feather as pf
-from datatypes import (
+
+from ctxcore.datatypes import (
     MotifOrTrackIDs,
     MotifsOrTracksType,
     RegionOrGeneIDs,
