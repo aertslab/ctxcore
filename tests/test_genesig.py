@@ -138,7 +138,9 @@ def test_regulon():
 
 
 def test_load_gmt():
-    gss = GeneSignature.from_gmt(field_separator='\t', gene_separator='\t', fname=TEST_SIGNATURE_FNAME)
+    gss = GeneSignature.from_gmt(
+        field_separator='\t', gene_separator='\t', fname=TEST_SIGNATURE_FNAME
+    )
     # http://software.broadinstitute.org/gsea/msigdb/collections.jsp#C6
     assert len(gss) == 189
     assert gss[0].name == "GLI1_UP.V1_DN"
@@ -147,7 +149,9 @@ def test_load_gmt():
 
 
 def test_add():
-    gss = GeneSignature.from_gmt(field_separator='\t', gene_separator='\t', fname=TEST_SIGNATURE_FNAME)
+    gss = GeneSignature.from_gmt(
+        field_separator='\t', gene_separator='\t', fname=TEST_SIGNATURE_FNAME
+    )
     res = gss[0].add("MEF2")
     assert "MEF2" in res
 

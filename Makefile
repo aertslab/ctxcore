@@ -54,13 +54,13 @@ coverage:
 # help: format                         - perform code style format
 .PHONY: format
 format:
-	@black -l 120 -S src/ctxcore tests
+	@black -S src/ctxcore tests
 
 
 # help: check-format                   - check code format compliance
 .PHONY: check-format
 check-format:
-	@black -l 120 -S  --check src/ctxcore tests
+	@black -S --check src/ctxcore tests
 
 
 # help: sort-imports                   - apply import sort ordering

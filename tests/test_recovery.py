@@ -10,7 +10,10 @@ from ctxcore.recovery import enrichment4features as enrichment
 from ctxcore.recovery import rcc2d, weighted_auc1d
 from ctxcore.rnkdb import FeatherRankingDatabase as RankingDatabase
 
-TEST_DATABASE_FNAME = resource_filename('resources.tests', "hg19-tss-centered-10kb-10species.mc9nr.genes_vs_motifs.rankings.feather")
+TEST_DATABASE_FNAME = resource_filename(
+    'resources.tests',
+    "hg19-tss-centered-10kb-10species.mc9nr.genes_vs_motifs.rankings.feather",
+)
 TEST_DATABASE_NAME = "hg19-tss-centered-10kb-10species.mc9nr.genes_vs_motifs.rankings"
 TEST_SIGNATURE_FNAME = resource_filename('resources.tests', "c6.all.v6.1.symbols.gmt")
 
@@ -108,10 +111,12 @@ def test_weighted_rcc2d_batch():
         n_genes = np.random.randint(20, high=total_genes)
         ranking = np.random.randint(low=0, high=total_genes, size=n_genes)
         rankings = ranking.reshape((1, n_genes))
-        rankings = np.append(rankings, np.full(shape=(1, 1), fill_value=total_genes), axis=1)
+        rankings = np.append(
+            rankings, np.full(shape=(1, 1), fill_value=total_genes), axis=1
+        )
         weights = np.ones(n_genes)
         # Disable normalization.
         auc_max = 1.0
-        assert rcc2d(rankings, np.insert(weights, len(weights), 0.0), total_genes)[:, :auc_rank_threshold].sum(
-            axis=1
-        ) == weighted_auc1d(ranking, weights, auc_rank_threshold, auc_max)
+        assert rcc2d(rankings, np.insert(weights, len(weights), 0.0), total_genes)[
+            :, :auc_rank_threshold
+        ].sum(axis=1) == weighted_auc1d(ranking, weights, auc_rank_threshold, auc_max)
