@@ -5,7 +5,6 @@ from abc import ABCMeta, abstractmethod
 from typing import Set, Tuple, Type
 
 import pandas as pd
-import pyarrow as pa
 from cytoolz import memoize
 
 from ctxcore.ctdb import CisTargetDatabase
@@ -13,41 +12,10 @@ from ctxcore.datatypes import RegionOrGeneIDs
 from ctxcore.genesig import GeneSignature
 
 
-class PyArrowThreads:
-    """
-    A static class to control how many threads PyArrow is allowed to use to convert a Feather database to a pandas
-    dataframe.
-
-    By default the number of threads is set to 4.
-    Overriding the number of threads is possible by using the environment variable "PYARROW_THREADS=nbr_threads".
-    """
-
-    pyarrow_threads = 4
-
-    if os.environ.get("PYARROW_THREADS"):
-        try:
-            # If "PYARROW_THREADS" is set, check if it is a number.
-            pyarrow_threads = int(os.environ.get("PYARROW_THREADS"))
-        except ValueError:
-            pass
-
-        if pyarrow_threads < 1:
-            # Set the number of PyArrow threads to 1 if a negative number or zero was specified.
-            pyarrow_threads = 1
-
-    @staticmethod
-    def set_nbr_pyarrow_threads(nbr_threads=None):
-        # Set number of threads to use for PyArrow when converting Feather database to pandas dataframe.
-        pa.set_cpu_count(nbr_threads if nbr_threads else PyArrowThreads.pyarrow_threads)
-
-
-PyArrowThreads.set_nbr_pyarrow_threads()
-
-
 class RankingDatabase(metaclass=ABCMeta):
     """
-    A class of a database of whole genome rankings. The whole genome is ranked for regulatory features of interest, e.g.
-    motifs for a transcription factor.
+    A class of a database of whole genome rankings. The whole genome is ranked for
+    regulatory features of interest, e.g. motifs for a transcription factor.
 
     The rankings of the genes are 0-based.
     """
@@ -122,7 +90,7 @@ class RankingDatabase(metaclass=ABCMeta):
         """
         Returns a unambiguous string representation.
         """
-        return '{}(name="{}")'.format(self.__class__.__name__, self._name)
+        return f'{self.__class__.__name__}(name="{self._name}")'
 
 
 class FeatherRankingDatabase(RankingDatabase):
@@ -135,9 +103,8 @@ class FeatherRankingDatabase(RankingDatabase):
         """
         super().__init__(name=name)
 
-        assert os.path.isfile(fname), "Database {0:s} doesn't exist.".format(fname)
+        assert os.path.isfile(fname), """Database "{fname}" doesn't exist."""
 
-        # FeatherReader cannot be pickle (important for dask framework) so filename is field instead.
         self._fname = fname
         self.ct_db = CisTargetDatabase.init_ct_db(
             ct_db_filename=self._fname, engine="pyarrow"
@@ -204,7 +171,7 @@ def opendb(fname: str, name: str) -> Type["RankingDatabase"]:
     :param name: The name of the database.
     :return: A ranking database.
     """
-    assert os.path.isfile(fname), "{} does not exist.".format(fname)
+    assert os.path.isfile(fname), f'"{fname}" does not exist.'
     assert name, "A database should be given a proper name."
 
     extension = os.path.splitext(fname)[1]
@@ -212,4 +179,4 @@ def opendb(fname: str, name: str) -> Type["RankingDatabase"]:
         # noinspection PyTypeChecker
         return FeatherRankingDatabase(fname, name=name)
     else:
-        raise ValueError("{} is an unknown extension.".format(extension))
+        raise ValueError(f'"{extension}" is an unknown extension.')
