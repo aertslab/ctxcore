@@ -111,7 +111,7 @@ class RegionOrGeneIDs:
         gene_ids_set = set()
         region_ids_set = set()
 
-        with open(bed_filename, "r") as fh:
+        with open(bed_filename, mode="r", encoding="utf-8") as fh:
             for line in fh:
                 if line and not line.startswith("#"):
                     columns = line.strip().split("\t")
@@ -178,7 +178,7 @@ class RegionOrGeneIDs:
         gene_ids_set = set()
         region_ids_set = set()
 
-        with open(fasta_filename, "r") as fh:
+        with open(fasta_filename, mode="r", encoding="utf-8") as fh:
             for line in fh:
                 if line.startswith(">"):
                     # Get region ID by getting everything after '>' up till the first whitespace.
