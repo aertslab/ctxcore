@@ -61,7 +61,7 @@ def test_RegionOrGeneIDs_with_regions():
     # Input region_or_gene_ids was a list ==> keep order.
     assert region_or_gene_ids_instance.ids == ("reg2", "reg1", "reg6")
 
-    assert eval(region_or_gene_ids_instance.__repr__()) == region_or_gene_ids_instance
+    assert eval(repr(region_or_gene_ids_instance)) == region_or_gene_ids_instance
     assert len(region_or_gene_ids_instance) == 3
 
 
@@ -75,7 +75,7 @@ def test_RegionOrGeneIDs_with_genes():
     # Input region_or_gene_ids was a set ==> will be sorted.
     assert region_or_gene_ids_instance.ids == ("gene1", "gene2", "gene6")
 
-    assert eval(region_or_gene_ids_instance.__repr__()) == region_or_gene_ids_instance
+    assert eval(repr(region_or_gene_ids_instance)) == region_or_gene_ids_instance
     assert len(region_or_gene_ids_instance) == 3
 
 
@@ -92,7 +92,7 @@ def test_RegionOrGeneIDs_with_regions_or_genes_type_str():
     # Input region_or_gene_ids was a tuple ==> keep order.
     assert region_or_gene_ids_instance.ids == ("gene2", "gene1", "gene6")
 
-    assert eval(region_or_gene_ids_instance.__repr__()) == region_or_gene_ids_instance
+    assert eval(repr(region_or_gene_ids_instance)) == region_or_gene_ids_instance
     assert len(region_or_gene_ids_instance) == 3
 
 
@@ -124,7 +124,7 @@ def test_MotifsOrTracksIDs_with_motifs():
     # Input motif_or_track_ids was a list ==> keep order.
     assert motif_or_track_ids_instance.ids == ("motif5", "motif10", "motif3")
 
-    assert eval(motif_or_track_ids_instance.__repr__()) == motif_or_track_ids_instance
+    assert eval(repr(motif_or_track_ids_instance)) == motif_or_track_ids_instance
     assert len(motif_or_track_ids_instance) == 3
 
 
@@ -138,7 +138,7 @@ def test_MotifsOrTracksIDs_with_tracks():
     # Input motif_or_track_ids was a set ==> will be sorted.
     assert motif_or_track_ids_instance.ids == ("track10", "track3", "track5")
 
-    assert eval(motif_or_track_ids_instance.__repr__()) == motif_or_track_ids_instance
+    assert eval(repr(motif_or_track_ids_instance)) == motif_or_track_ids_instance
     assert len(motif_or_track_ids_instance) == 3
 
 
@@ -155,5 +155,5 @@ def test_MotifsOrTracksIDs_with_motifs_or_tracks_type_str():
     # Input motif_or_track_ids was a tuple ==> keep order.
     assert motif_or_track_ids_instance.ids == ("track5", "track10", "track3")
 
-    assert eval(motif_or_track_ids_instance.__repr__()) == motif_or_track_ids_instance
+    assert eval(repr(motif_or_track_ids_instance)) == motif_or_track_ids_instance
     assert len(motif_or_track_ids_instance) == 3
