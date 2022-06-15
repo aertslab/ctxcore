@@ -3,7 +3,8 @@
 import gzip
 import os
 import re
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable
+from collections.abc import Mapping as ABCMapping
 from itertools import chain, repeat
 from typing import FrozenSet, List, Mapping, Type
 
@@ -15,7 +16,7 @@ from frozendict import frozendict
 
 def convert(genes):
     # Genes supplied as dictionary.
-    if isinstance(genes, Mapping):
+    if isinstance(genes, ABCMapping):
         return frozendict(genes)
     # Genes supplied as iterable of (gene, weight) tuples.
     elif isinstance(genes, Iterable) and all(isinstance(n, tuple) for n in genes):
@@ -27,9 +28,9 @@ def convert(genes):
 
 def openfile(filename, mode="r"):
     if filename.endswith(".gz"):
-        return gzip.open(filename, mode)
+        return gzip.open(filename, mode, encoding="utf-8")
     else:
-        return open(filename, mode)
+        return open(filename, mode, encoding="utf-8")
 
 
 @attr.s(frozen=True)
@@ -69,7 +70,7 @@ class GeneSignature(yaml.YAMLObject):
         :return: A list of signatures.
         """
         # https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats
-        assert os.path.exists(fname), "{} does not exist.".format(fname)
+        assert os.path.exists(fname), f'"{fname}" does not exist.'
 
         def signatures():
             with openfile(fname, "r") as file:
@@ -78,9 +79,11 @@ class GeneSignature(yaml.YAMLObject):
                         line = line.decode()
                     if line.startswith("#") or not line.strip():
                         continue
-                    columns = re.split(field_separator, line.rstrip())
-                    genes = columns[2:]
-                    yield GeneSignature(name=columns[0], gene2weight=genes)
+                    name, _, genes_str = re.split(
+                        field_separator, line.rstrip(), maxsplit=2
+                    )
+                    genes = genes_str.split(gene_separator)
+                    yield GeneSignature(name=name, gene2weight=genes)
 
         return list(signatures())
 
@@ -105,13 +108,8 @@ class GeneSignature(yaml.YAMLObject):
             for signature in signatures:
                 genes = gene_separator.join(signature.genes)
                 file.write(
-                    "{}{}{}{}{}\n".format(
-                        signature.name,
-                        field_separator,
-                        signature.metadata(","),
-                        field_separator,
-                        genes,
-                    )
+                    f"{signature.name},{field_separator},{signature.metadata(',')},"
+                    f"{field_separator}{genes}\n"
                 )
 
     @classmethod
@@ -124,7 +122,8 @@ class GeneSignature(yaml.YAMLObject):
         :return: A signature.
         """
         # https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats
-        assert os.path.exists(fname), "{} does not exist.".format(fname)
+        assert os.path.exists(fname), f'"{fname}" does not exist.'
+
         with openfile(fname, "r") as file:
             return GeneSignature(
                 name=name,
@@ -146,7 +145,7 @@ class GeneSignature(yaml.YAMLObject):
         :return: A signature.
         """
         # https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats
-        assert os.path.exists(fname), "{} does not exist.".format(fname)
+        assert os.path.exists(fname), f'"{fname}" does not exist.'
 
         def columns():
             with openfile(fname, "r") as file:
@@ -243,7 +242,7 @@ class GeneSignature(yaml.YAMLObject):
         :return: the new :class:`GeneSignature` instance.
         """
         return self.copy(
-            name="({} | {})".format(self.name, other.name)
+            name=f"({self.name} | {other.name})"
             if self.name != other.name
             else self.name,
             gene2weight=frozendict(
@@ -262,7 +261,7 @@ class GeneSignature(yaml.YAMLObject):
         :return: the new :class:`GeneSignature` instance.
         """
         return self.copy(
-            name="({} - {})".format(self.name, other.name)
+            name=f"({self.name} - {other.name})"
             if self.name != other.name
             else self.name,
             gene2weight=frozendict(dissoc(dict(self.gene2weight), *other.genes)),
@@ -280,7 +279,7 @@ class GeneSignature(yaml.YAMLObject):
         """
         genes = set(self.gene2weight.keys()).intersection(set(other.gene2weight.keys()))
         return self.copy(
-            name="({} & {})".format(self.name, other.name)
+            name=f"({self.name} & {other.name})"
             if self.name != other.name
             else self.name,
             gene2weight=frozendict(
@@ -338,7 +337,7 @@ class GeneSignature(yaml.YAMLObject):
         """
         Returns a readable string representation.
         """
-        return "[]".format(",".join(self.genes))
+        return f"[{','.join(self.genes)}]"
 
     def __repr__(self):
         """
@@ -348,11 +347,7 @@ class GeneSignature(yaml.YAMLObject):
             self.__class__.__name__,
             self.name,
             "["
-            + ",".join(
-                map(
-                    lambda g, w: '("{}",{})'.format(g, w), zip(self.genes, self.weights)
-                )
-            )
+            + ",".join(map(lambda g, w: f'("{g}",{w})', zip(self.genes, self.weights)))
             + "]",
         )
 
@@ -389,14 +384,14 @@ class Regulon(GeneSignature, yaml.YAMLObject):
             transcription_factor=data["transcription_factor"],
         )
 
-    gene2occurrence = attr.ib(converter=convert)  # Mapping[str, float]
-    transcription_factor = attr.ib()  # str
-    context = attr.ib(default=frozenset())  # FrozenSet[str]
-    score = attr.ib(default=0.0)  # float
-    nes = attr.ib(default=0.0)  # float
-    orthologous_identity = attr.ib(default=0.0)  # float
-    similarity_qvalue = attr.ib(default=0.0)  # float
-    annotation = attr.ib(default="")  # str
+    gene2occurrence: Mapping[str, float] = attr.ib(converter=convert)
+    transcription_factor: str = attr.ib()
+    context: FrozenSet[str] = attr.ib(default=frozenset())
+    score: float = attr.ib(default=0.0)
+    nes: float = attr.ib(default=0.0)
+    orthologous_identity: float = attr.ib(default=0.0)
+    similarity_qvalue: float = attr.ib(default=0.0)
+    annotation: str = attr.ib(default="")
 
     @transcription_factor.validator
     def non_empty(self, attribute, value):
@@ -404,9 +399,7 @@ class Regulon(GeneSignature, yaml.YAMLObject):
             raise ValueError("A regulon must have a transcription factor.")
 
     def metadata(self, field_separator: str = ",") -> str:
-        return "tf={}{}score={}".format(
-            self.transcription_factor, field_separator, self.score
-        )
+        return f"tf={self.transcription_factor}{field_separator}score={self.score}"
 
     def copy(self, **kwargs) -> "Regulon":
         try:
