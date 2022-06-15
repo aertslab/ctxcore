@@ -2,7 +2,7 @@
 
 import os
 from abc import ABCMeta, abstractmethod
-from typing import Set, Tuple, Type
+from typing import Set, Tuple
 
 import pandas as pd
 from cytoolz import memoize
@@ -71,7 +71,7 @@ class RankingDatabase(metaclass=ABCMeta):
         pass
 
     @abstractmethod
-    def load(self, gs: Type[GeneSignature]) -> pd.DataFrame:
+    def load(self, gs: GeneSignature) -> pd.DataFrame:
         """
         Load the ranking of the genes in the supplied signature for all features in this database.
 
@@ -125,7 +125,7 @@ class FeatherRankingDatabase(RankingDatabase):
             region_or_gene_ids=self.ct_db.all_region_or_gene_ids
         )
 
-    def load(self, gs: Type[GeneSignature]) -> pd.DataFrame:
+    def load(self, gs: GeneSignature) -> pd.DataFrame:
         # For some genes in the signature there might not be a rank available in the database.
         gene_set = self.geneset.intersection(set(gs.genes))
 
@@ -142,7 +142,7 @@ class MemoryDecorator(RankingDatabase):
     A decorator for a ranking database which loads the entire database in memory.
     """
 
-    def __init__(self, db: Type[RankingDatabase]):
+    def __init__(self, db: RankingDatabase):
         assert db, "Database should be supplied."
         self._db = db
         self._df = db.load_full()
@@ -159,11 +159,11 @@ class MemoryDecorator(RankingDatabase):
     def load_full(self) -> pd.DataFrame:
         return self._df
 
-    def load(self, gs: Type[GeneSignature]) -> pd.DataFrame:
+    def load(self, gs: GeneSignature) -> pd.DataFrame:
         return self._df.loc[:, self._df.columns.isin(gs.genes)]
 
 
-def opendb(fname: str, name: str) -> Type["RankingDatabase"]:
+def opendb(fname: str, name: str) -> RankingDatabase:
     """
     Open a ranking database.
 
