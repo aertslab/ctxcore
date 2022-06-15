@@ -74,7 +74,7 @@ def get_ct_db_type_from_ct_db_filename(
         # Remove the leading ".".
         suffix = suffix[1:]
 
-        if suffix == "rankings" or suffix == "scores":
+        if suffix in ("scores", "rankings"):
             scores_or_rankings = suffix
         else:
             m = re.match(
@@ -87,23 +87,31 @@ def get_ct_db_type_from_ct_db_filename(
                 elif m.group(3, 4) != (None, None):
                     column_kind, row_kind = m.group(3, 4)
 
-    if not scores_or_rankings and not column_kind:
+    if (
+        isinstance(scores_or_rankings, str)
+        and isinstance(column_kind, str)
+        and isinstance(row_kind, str)
+    ):
+        return scores_or_rankings, column_kind, row_kind
+    elif not scores_or_rankings and not column_kind and not row_kind:
         raise ValueError(
             f'cisTarget database filename "{ct_db_filename}" does not end with '
             f'".((motifs|tracks)_vs_(regions|genes)|(regions|genes)_vs_(motifs|tracks)).(scores|rankings).feather".'
         )
-    elif scores_or_rankings and not column_kind:
+    elif scores_or_rankings and not column_kind and not row_kind:
         raise ValueError(
             f'cisTarget database filename "{ct_db_filename}" does not end with '
             f'".((motifs|tracks)_vs_(regions|genes)|(regions|genes)_vs_(motifs|tracks)).{scores_or_rankings}.feather".'
         )
-    elif not scores_or_rankings and column_kind:
+    elif not scores_or_rankings and column_kind and row_kind:
         raise ValueError(
             f'cisTarget database filename "{ct_db_filename}" does not end with '
             f'".{column_kind}_vs_{row_kind}.(scores|rankings).feather".'
         )
-
-    return scores_or_rankings, column_kind, row_kind
+    else:
+        raise ValueError(
+            f'Unknown error while parsing cisTarget database filename "{ct_db_filename}".'
+        )
 
 
 class CisTargetDatabase:
@@ -141,7 +149,7 @@ class CisTargetDatabase:
         if not isinstance(ct_db_filename, Path):
             ct_db_filename = Path(ct_db_filename)
 
-        if engine == "polars" or engine == "polars_pyarrow":
+        if engine in ("polars", "polars_pyarrow"):
             use_pyarrow = False
         elif engine == "pyarrow":
             use_pyarrow = True
@@ -212,7 +220,7 @@ class CisTargetDatabase:
                     )
                 break
 
-        if not index_column_name:
+        if not index_column_name or not index_column_idx:
             raise ValueError(
                 '"{ct_db_filename}" is not a cisTarget database file as it does not contain a "motifs", "tracks", '
                 '"regions" or "genes" column.'
@@ -234,6 +242,7 @@ class CisTargetDatabase:
             )
 
         column_dtype = column_dtype[0]
+        dtype: Union[Type[np.int16], Type[np.int32], Type[np.float32]]
 
         if use_pyarrow:
             if column_dtype == pa.int16():
@@ -287,7 +296,7 @@ class CisTargetDatabase:
         # Assume column kind is correct if the other values were correct.
         column_kind = column_kind_from_filename
 
-        if column_kind == "genes" or column_kind == "regions":
+        if column_kind in ("regions", "genes"):
             # Create cisTarget database object if the correct database was provided.
             return CisTargetDatabase(
                 ct_db_filename=ct_db_filename,
@@ -440,7 +449,7 @@ class CisTargetDatabase:
 
     def has_all_region_or_gene_ids(
         self, region_or_gene_ids: RegionOrGeneIDs
-    ) -> (bool, RegionOrGeneIDs, RegionOrGeneIDs):
+    ) -> Tuple[bool, RegionOrGeneIDs, RegionOrGeneIDs]:
         """
         Check if all input region IDs or gene IDs are found in the cisTarget database.
 
@@ -508,11 +517,13 @@ class CisTargetDatabase:
             self.df_cached = pl.read_ipc(
                 file=self.ct_db_filename,
                 columns=(
-                    found_region_or_gene_ids.sort().ids
+                    list(found_region_or_gene_ids.sort().ids)
                     if sort
-                    else found_region_or_gene_ids.ids
+                    else list(found_region_or_gene_ids.ids)
                 )
-                + (self.all_motif_or_track_ids.type.value,),
+                + [
+                    self.all_motif_or_track_ids.type.value,
+                ],
                 use_pyarrow=use_pyarrow,
                 memory_map=False,
                 rechunk=False,
@@ -521,6 +532,13 @@ class CisTargetDatabase:
             # Keep track of loaded region IDs or gene IDs scores/rankings.
             self.region_or_gene_ids_loaded = found_region_or_gene_ids
         else:
+            if not self.region_or_gene_ids_loaded:
+                raise ValueError(
+                    "CisTargetDatabase object is in an inconsistent state: "
+                    '"region_or_gene_ids_loaded" attribute is None, but '
+                    '"df_cached" is not.'
+                )
+
             # Get region IDs or gene IDs subset for which no scores/rankings were loaded before.
             region_or_gene_ids_to_load = found_region_or_gene_ids.difference(
                 self.region_or_gene_ids_loaded
@@ -533,7 +551,7 @@ class CisTargetDatabase:
                 self.df_cached.hstack(
                     columns=pl.read_ipc(
                         file=self.ct_db_filename,
-                        columns=region_or_gene_ids_to_load.ids,
+                        columns=list(region_or_gene_ids_to_load.ids),
                         use_pyarrow=use_pyarrow,
                         memory_map=False,
                         rechunk=False,
@@ -602,6 +620,13 @@ class CisTargetDatabase:
             # Keep track of loaded region IDs or gene IDs scores/rankings.
             self.region_or_gene_ids_loaded = found_region_or_gene_ids
         else:
+            if not self.region_or_gene_ids_loaded:
+                raise ValueError(
+                    "CisTargetDatabase object is in an inconsistent state: "
+                    '"region_or_gene_ids_loaded" attribute is None, but '
+                    '"df_cached" is not.'
+                )
+
             # Get region IDs or gene IDs subset for which no scores/rankings were loaded before.
             region_or_gene_ids_to_load = found_region_or_gene_ids.difference(
                 self.region_or_gene_ids_loaded
@@ -743,6 +768,13 @@ class CisTargetDatabase:
         # Fetch scores or rankings for input region IDs or gene IDs from cisTarget database file for region IDs or
         # gene IDs which were not prefetched in previous calls.
         self.prefetch(region_or_gene_ids=region_or_gene_ids, engine=engine, sort=True)
+
+        if not self.df_cached:
+            raise RuntimeError(
+                f"Prefetch failed to retrieve {self.scores_or_rankings} for "
+                f"{region_or_gene_ids} from cisTarget database "
+                f'"{self.ct_db_filename}".'
+            )
 
         if engine == "pyarrow":
             # Select input region IDs or gene IDs subset and motif or track column from pyarrow Table and convert to
