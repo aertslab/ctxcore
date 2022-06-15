@@ -36,7 +36,7 @@ def gs():
 
 
 def test_enrichment(db, gs):
-    df = enrichment(db, gs)
+    _df = enrichment(db, gs)
 
 
 def test_auc1d_1():
@@ -70,7 +70,6 @@ def test_weighted_auc1d():
     # of the AUC is that in the latter the rank threshold would not be included. This has an influence on the
     # normalization factor max AUC but nothing else.
 
-    total_genes = 100
     auc_rank_threshold = 8
     # The databases have a zero-based ranking system.
     ranking = np.asarray([2, 4, 6]) - 1
