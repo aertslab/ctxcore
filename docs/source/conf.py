@@ -41,8 +41,8 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'ctxcore'
-copyright = '2021, Bram Van de Sande, Christopher Flerin'
-author = 'Bram Van de Sande, Christopher Flerin'
+copyright = '2021-2022, Bram Van de Sande, Christopher Flerin, Gert Hulselmans'
+author = 'Bram Van de Sande, Christopher Flerin, Gert Hulselmans'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -58,7 +58,7 @@ release = 'latest'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -121,3 +121,31 @@ html_sidebars = {
 #
 #def setup(app):
 #    app.connect('builder-inited', run_apidoc)
+# automate building API .rst files, necessary for ReadTheDocs, as inspired by:
+# https://github.com/readthedocs/readthedocs.org/issues/1139#issuecomment-398083449
+
+def run_apidoc(_):
+    ignore_paths = []
+
+    argv = [
+        "-f",
+        "-T",
+        "-e",
+        "-M",
+        "-o", ".",
+        ".."
+    ] + ignore_paths
+
+    try:
+        # Sphinx >= 1.7
+        from sphinx.ext import apidoc
+        apidoc.main(argv)
+    except ImportError:
+        # Sphinx  < 1.7
+        from sphinx import apidoc
+        argv.insert(0, apidoc.__file__)
+        apidoc.main(argv)
+
+
+def setup(app):
+    app.connect('builder-inited', run_apidoc)
