@@ -1,5 +1,4 @@
 # https://pypi.python.org/pypi/check-manifest
 include requirements.txt
 include src/resources/tests/*.feather
-include src/resources/tests/*.db
 include src/resources/tests/*.gmt
