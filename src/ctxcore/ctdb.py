@@ -1,8 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import re
+import sys
 from pathlib import Path
-from typing import Literal, Optional, Tuple, Type, Union
+from typing import Optional, Tuple, Type, Union
+
+if sys.version_info >= (3, 8):
+    from typing import Literal
+else:
+    from typing_extensions import Literal  # pragma: no cover
+
 
 import numpy as np
 import pandas as pd
