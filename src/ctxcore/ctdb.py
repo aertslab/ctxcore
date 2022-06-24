@@ -6,7 +6,6 @@ from typing import Literal, Optional, Tuple, Type, Union
 
 import numpy as np
 import pandas as pd
-import polars as pl
 import pyarrow as pa
 import pyarrow.dataset as ds
 import pyarrow.feather as pf
@@ -179,6 +178,8 @@ class CisTargetDatabase:
             column_names = schema.names
             dtypes = schema.types
         else:
+            import polars as pl
+
             # Get column names from cisTarget Feather file with polars without loading the whole database.
             schema = pl.read_ipc_schema(file=ct_db_filename)
             column_names = list(schema.keys())
@@ -208,6 +209,8 @@ class CisTargetDatabase:
                         .to_pylist()
                     )
                 else:
+                    import polars as pl
+
                     row_names = (
                         pl.read_ipc(
                             file=ct_db_filename,
@@ -259,6 +262,8 @@ class CisTargetDatabase:
                     f'Unsupported dtype "{column_dtype}" for cisTarget database.'
                 )
         else:
+            import polars as pl
+
             if column_dtype == pl.Int16:
                 scores_or_rankings = "rankings"
                 dtype = np.int16
@@ -353,9 +358,14 @@ class CisTargetDatabase:
         # Count number of motif IDs or track IDs.
         self._nbr_total_motif_or_track_ids = len(self.all_motif_or_track_ids)
 
+        try:
+            import polars as pl
+        except ImportError:
+            pass
+
         # Polars dataframe or pyarrow Table with scores or rankings for those region IDs or gene IDs that where loaded
         # with cisTargetDatabase.prefetch(). This acts as a cache.
-        self.df_cached: Optional[Union[pl.DataFrame, pa.Table]] = None
+        self.df_cached: Optional[Union["pl.DataFrame", pa.Table]] = None
 
         # Keep track for which region IDs or gene IDs, scores or rankings are loaded with cisTargetDatabase.prefetch().
         self.region_or_gene_ids_loaded: Optional[RegionOrGeneIDs] = None
@@ -504,6 +514,8 @@ class CisTargetDatabase:
             raise ValueError(
                 f"Not all provided {self.all_region_or_gene_ids.type} are found: {not_found_region_or_gene_ids}"
             )
+
+        import polars as pl
 
         if self.df_cached and isinstance(self.df_cached, pa.Table):
             # Convert pyarrow Table to polars Dataframe (in case engine="pyarrow" was used before).
