@@ -30,6 +30,8 @@ pip install pip --upgrade
 echo "Installing $RELEASE_ARCHIVE"
 pip install $RELEASE_ARCHIVE
 
+pip install pytest==7.1.2
+
 echo "Running tests"
 cd ../tests
 python -m unittest discover -s .
