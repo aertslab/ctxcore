@@ -24,8 +24,8 @@ requirements = parse_requirements("requirements.txt")
 if __name__ == "__main__":
     setup(
         name="ctxcore",
-        use_scm_version=True,
-        setup_requires=["setuptools_scm"],
+        version='0.2.0',
+        setup_requires=["setuptools"],
         description="Core functions for pycisTarget and the SCENIC tool suite",
         long_description="\n\n".join([readme, changes]),
         license="GNU General Public License v3",
