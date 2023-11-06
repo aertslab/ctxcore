@@ -103,7 +103,7 @@ class FeatherRankingDatabase(RankingDatabase):
         """
         super().__init__(name=name)
 
-        assert os.path.isfile(fname), """Database "{fname}" doesn't exist."""
+        assert os.path.isfile(fname), f"""Database "{fname}" doesn't exist."""
 
         self._fname = fname
         self.ct_db = CisTargetDatabase.init_ct_db(
