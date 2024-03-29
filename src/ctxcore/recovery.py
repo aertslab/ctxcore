@@ -77,7 +77,7 @@ def rcc2d(rankings: np.ndarray, weights: np.ndarray, rank_threshold: int) -> np.
     for row_idx in range(n_features):
         curranking = rankings[row_idx, :]
         rccs[row_idx, :] = np.cumsum(
-            np.bincount(curranking, weights=weights)[:rank_threshold]
+            np.bincount(curranking.astype(int), weights=weights)[:rank_threshold]
         )
     return rccs
 
