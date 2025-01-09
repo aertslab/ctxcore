@@ -58,7 +58,7 @@ def is_feather_v1_or_v2(feather_filename: Union[Path, str]) -> Optional[int]:
 
 
 def get_ct_db_type_from_ct_db_filename(
-    ct_db_filename: Union[Path, str]
+    ct_db_filename: Union[Path, str],
 ) -> Tuple[str, str, str]:
     """
     Get cisTarget database type from cisTarget database filename.
