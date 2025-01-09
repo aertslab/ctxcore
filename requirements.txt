@@ -1,8 +1,11 @@
 cytoolz
+diptest
 frozendict
 numba>=0.51.2
 numpy
 pandas>=0.24
 pyarrow>=8.0.0
 pyyaml
+scipy
+scikit-learn>=0.22.2
 tqdm
