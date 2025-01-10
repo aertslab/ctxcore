@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=64", "setuptools_scm>=8"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ctxcore"
+dynamic = ["version"]
+description = "Core functions for pycisTarget and the SCENIC tool suite"
+readme = { file = "README.rst", content-type = "text/x-rst" }
+requires-python = ">=3.8"
+license = { text = "GNU General Public License v3" }
+authors = [
+  { name = "Bram Van de Sande" },
+  { name = "Gert Hulselmans", email = "gert.hulselmans@kuleuven.be" },
+]
+maintainers = [
+  { name = "Gert Hulselmans", email = "gert.hulselmans@kuleuven.be" },
+]
+keywords = ["ctxcore", "cisTarget", "pycisTarget", "SCENIC", "pySCENIC", "pycisTopic", "scenicplus"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+  "cytoolz",
+  "diptest",
+  "frozendict",
+  "numba>=0.57.0",
+  "numpy",
+  "pandas>=1.5",
+  "pyarrow>=14.0.0",
+  "pyyaml",
+  "scipy",
+  "scikit-learn>=0.22.2",
+  "tqdm",
+]
+
+[project.urls]
+Homepage = "https://github.com/aertslab/ctxcore"
+Documentation = "https://ctxcore.readthedocs.io/"
+Repository = "https://github.com/aertslab/ctxcore"
+Changelog = "https://github.com/aertslab/ctxcore/blob/main/CHANGELOG.rst"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+include-package-data = true
+zip-safe = false
+
+[tool.setuptools.packages.find]
+where = ["src"]
+namespaces = false
+
+[tool.setuptools_scm]
+version_file = "src/ctxcore/_version.py"
