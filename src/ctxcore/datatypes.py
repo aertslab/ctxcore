@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 import re
 from enum import Enum, unique
-from typing import List, Optional, Set, Tuple, Union
 
 
 @unique
@@ -11,7 +12,7 @@ class RegionsOrGenesType(Enum):
     GENES = "genes"
 
     @classmethod
-    def from_str(cls, regions_or_genes_type: str) -> "RegionsOrGenesType":
+    def from_str(cls, regions_or_genes_type: str) -> RegionsOrGenesType:
         """
         Create RegionsOrGenesType Enum member from string.
 
@@ -35,7 +36,7 @@ class MotifsOrTracksType(Enum):
     TRACKS = "tracks"
 
     @classmethod
-    def from_str(cls, motifs_or_tracks_type: str) -> "MotifsOrTracksType":
+    def from_str(cls, motifs_or_tracks_type: str) -> MotifsOrTracksType:
         """
         Create MotifsOrTracksType Enum member from string.
 
@@ -59,7 +60,7 @@ class ScoresOrRankingsType(Enum):
     RANKINGS = "rankings"
 
     @classmethod
-    def from_str(cls, scores_or_rankings_type: str) -> "ScoresOrRankingsType":
+    def from_str(cls, scores_or_rankings_type: str) -> ScoresOrRankingsType:
         """
         Create ScoresOrRankingsType Enum member from string.
 
@@ -77,26 +78,30 @@ class ScoresOrRankingsType(Enum):
 
 class RegionOrGeneIDs:
     """
-    RegionOrGeneIDs class represents a unique sorted tuple of region or gene IDs for constructing a Pandas dataframe
-    index for a cisTarget database.
+    RegionOrGeneIDs class represents a unique sorted tuple of region or gene IDs
+    for constructing a Pandas dataframe index for a cisTarget database.
     """
 
     @staticmethod
     def get_region_or_gene_ids_from_bed(
         bed_filename: str,
-        extract_gene_id_from_region_id_regex_replace: Optional[str] = None,
-    ) -> "RegionOrGeneIDs":
+        extract_gene_id_from_region_id_regex_replace: str | None = None,
+    ) -> RegionOrGeneIDs:
         """
+        Get all region or gene IDs (from column 4) from BED filename.
+
         Get all region or gene IDs (from column 4) from BED filename:
-          - When extract_gene_id_from_region_id_regex_replace=None, region IDs are returned and each region ID is only
-            allowed once in the BED file.
-          - When extract_gene_id_from_region_id_regex_replace is set to a regex to remove the non gene ID part from the
-            region IDs, gene IDs are returned and each gene is allowed to appear more than once in the BED file.
+          - When extract_gene_id_from_region_id_regex_replace=None, region IDs are
+            returned and each region ID is only allowed once in the BED file.
+          - When extract_gene_id_from_region_id_regex_replace is set to a regex to
+            remove the non gene ID part from the region IDs, gene IDs are returned
+            and each gene is allowed to appear more than once in the BED file.
 
         :param bed_filename:
              BED filename with sequences for region or gene IDs.
         :param extract_gene_id_from_region_id_regex_replace:
-             regex for removing unwanted parts from the region ID to extract the gene ID.
+             regex for removing unwanted parts from the region ID to extract the gene
+             ID.
         :return: RegionOrGeneIDs object for regions or genes.
         """
         gene_ids = []
@@ -104,7 +109,7 @@ class RegionOrGeneIDs:
         gene_ids_set = set()
         region_ids_set = set()
 
-        with open(bed_filename, encoding="utf-8") as fh:
+        with open(bed_filename, encoding="utf-8") as fh:  # noqa: PTH123
             for line in fh:
                 if line and not line.startswith("#"):
                     columns = line.strip().split("\t")
@@ -148,19 +153,23 @@ class RegionOrGeneIDs:
     @staticmethod
     def get_region_or_gene_ids_from_fasta(
         fasta_filename: str,
-        extract_gene_id_from_region_id_regex_replace: Optional[str] = None,
-    ) -> "RegionOrGeneIDs":
+        extract_gene_id_from_region_id_regex_replace: str | None = None,
+    ) -> RegionOrGeneIDs:
         """
+        Get all region or gene IDs from FASTA filename.
+
         Get all region or gene IDs from FASTA filename:
-          - When extract_gene_id_from_region_id_regex_replace=None, region IDs are returned and each region ID is only
-            allowed once in the FASTA file.
-          - When extract_gene_id_from_region_id_regex_replace is set to a regex to remove the non gene ID part from the
-            region IDs, gene IDs are returned and each gene is allowed to appear more than once in the FASTA file.
+          - When extract_gene_id_from_region_id_regex_replace=None, region IDs are
+            returned and each region ID is only allowed once in the FASTA file.
+          - When extract_gene_id_from_region_id_regex_replace is set to a regex to
+            remove the non gene ID part from the region IDs, gene IDs are returned
+            and each gene is allowed to appear more than once in the FASTA file.
 
         :param fasta_filename:
              FASTA filename with sequences for region or gene IDs.
         :param extract_gene_id_from_region_id_regex_replace:
-             regex for removing unwanted parts from the region ID to extract the gene ID.
+             regex for removing unwanted parts from the region ID to extract the gene
+             ID.
         :return: RegionOrGeneIDs object for regions or genes.
         """
         gene_ids = []
@@ -168,10 +177,11 @@ class RegionOrGeneIDs:
         gene_ids_set = set()
         region_ids_set = set()
 
-        with open(fasta_filename, encoding="utf-8") as fh:
+        with open(fasta_filename, encoding="utf-8") as fh:  # noqa: PTH123
             for line in fh:
                 if line.startswith(">"):
-                    # Get region ID by getting everything after '>' up till the first whitespace.
+                    # Get region ID by getting everything after '>' up till the first
+                    # whitespace.
                     region_id = line[1:].split(maxsplit=1)[0]
 
                     if extract_gene_id_from_region_id_regex_replace:
@@ -205,15 +215,18 @@ class RegionOrGeneIDs:
 
     def __init__(
         self,
-        region_or_gene_ids: Union[List[str], Set[str], Tuple[str, ...]],
-        regions_or_genes_type: Union[RegionsOrGenesType, str],
+        region_or_gene_ids: list[str] | set[str] | tuple[str, ...],
+        regions_or_genes_type: RegionsOrGenesType | str,
     ) -> None:
         """
-        Create unique tuple of region or gene IDs from a list, set or tuple of region or gene IDs,
-        annotated with RegionsOrGenesType Enum.
+        Create unique region IDs or gene IDs.
+
+        Create unique tuple of region or gene IDs from a list, set or tuple of region
+        or gene IDs, annotated with RegionsOrGenesType Enum.
 
         :param region_or_gene_ids: list, set or tuple of region or gene IDs.
-        :param regions_or_genes_type: RegionsOrGenesType.REGIONS ("regions") or RegionsOrGenesType.GENES ("genes").
+        :param regions_or_genes_type: RegionsOrGenesType.REGIONS ("regions") or
+            RegionsOrGenesType.GENES ("genes").
         """
         if isinstance(regions_or_genes_type, str):
             regions_or_genes_type = RegionsOrGenesType.from_str(regions_or_genes_type)
@@ -252,16 +265,16 @@ class RegionOrGeneIDs:
     def __len__(self) -> int:
         return len(self.ids)
 
-    def __getitem__(self, items) -> "RegionOrGeneIDs":
+    def __getitem__(self, items: int | slice) -> RegionOrGeneIDs:
         if isinstance(items, int):
             return RegionOrGeneIDs((self.ids[items],), self.type)
 
         return RegionOrGeneIDs(self.ids[items], self.type)
 
-    def difference(self, other: "RegionOrGeneIDs") -> "RegionOrGeneIDs":
+    def difference(self, other: RegionOrGeneIDs) -> RegionOrGeneIDs:
         """
-        Get which region or gene IDs in the current RegionOrGeneIDs object are not present in the other RegionOrGeneIDs
-        object.
+        Get which region or gene IDs in the current RegionOrGeneIDs object are not
+        present in the other RegionOrGeneIDs object.
 
         :param other: RegionOrGeneIDs object
         :return: RegionOrGeneIDs object
@@ -269,9 +282,9 @@ class RegionOrGeneIDs:
         if not isinstance(other, RegionOrGeneIDs):
             return NotImplemented
 
-        assert (
-            self.type == other.type
-        ), "RegionOrGeneIDs objects are of a different type."
+        assert self.type == other.type, (
+            "RegionOrGeneIDs objects are of a different type."
+        )
 
         return RegionOrGeneIDs(
             region_or_gene_ids=sorted(
@@ -280,10 +293,10 @@ class RegionOrGeneIDs:
             regions_or_genes_type=self.type,
         )
 
-    def intersection(self, other: "RegionOrGeneIDs") -> "RegionOrGeneIDs":
+    def intersection(self, other: RegionOrGeneIDs) -> RegionOrGeneIDs:
         """
-        Get which region or gene IDs in the current RegionOrGeneIDs object are present in the other RegionOrGeneIDs
-        object.
+        Get which region or gene IDs in the current RegionOrGeneIDs object are present
+        in the other RegionOrGeneIDs object.
 
         :param other: RegionOrGeneIDs object
         :return: RegionOrGeneIDs object
@@ -291,9 +304,9 @@ class RegionOrGeneIDs:
         if not isinstance(other, RegionOrGeneIDs):
             return NotImplemented
 
-        assert (
-            self.type == other.type
-        ), "RegionOrGeneIDs objects are of a different type."
+        assert self.type == other.type, (
+            "RegionOrGeneIDs objects are of a different type."
+        )
 
         return RegionOrGeneIDs(
             region_or_gene_ids=sorted(
@@ -302,10 +315,10 @@ class RegionOrGeneIDs:
             regions_or_genes_type=self.type,
         )
 
-    def issubset(self, other: "RegionOrGeneIDs") -> bool:
+    def issubset(self, other: RegionOrGeneIDs) -> bool:
         """
-        Check if all region or gene IDs in the current RegionOrGeneIDs object are at least present in the other
-        RegionOrGeneIDs object.
+        Check if all region or gene IDs in the current RegionOrGeneIDs object are at
+        least present in the other RegionOrGeneIDs object.
 
         :param other: RegionOrGeneIDs object
         :return: True or False
@@ -313,16 +326,16 @@ class RegionOrGeneIDs:
         if not isinstance(other, RegionOrGeneIDs):
             return NotImplemented
 
-        assert (
-            self.type == other.type
-        ), "RegionOrGeneIDs objects are of a different type."
+        assert self.type == other.type, (
+            "RegionOrGeneIDs objects are of a different type."
+        )
 
         return self.ids_set.issubset(other.ids_set)
 
-    def issuperset(self, other: "RegionOrGeneIDs") -> bool:
+    def issuperset(self, other: RegionOrGeneIDs) -> bool:
         """
-        Check if all region or gene IDs in the other RegionOrGeneIDs object are at least present in the current
-        RegionOrGeneIDs object.
+        Check if all region or gene IDs in the other RegionOrGeneIDs object are at
+        least present in the current RegionOrGeneIDs object.
 
         :param other: RegionOrGeneIDs object
         :return: True or False
@@ -330,19 +343,20 @@ class RegionOrGeneIDs:
         if not isinstance(other, RegionOrGeneIDs):
             return NotImplemented
 
-        assert (
-            self.type == other.type
-        ), "RegionOrGeneIDs objects are of a different type."
+        assert self.type == other.type, (
+            "RegionOrGeneIDs objects are of a different type."
+        )
 
         return self.ids_set.issuperset(other.ids_set)
 
-    def sort(self) -> "RegionOrGeneIDs":
+    def sort(self) -> RegionOrGeneIDs:
         """Sort region IDs or gene IDs."""
         return RegionOrGeneIDs(sorted(self.ids), self.type)
 
-    def union(self, other: "RegionOrGeneIDs") -> "RegionOrGeneIDs":
+    def union(self, other: RegionOrGeneIDs) -> RegionOrGeneIDs:
         """
-        Get union of region or gene IDs in the current RegionOrGeneIDs object and in the other RegionOrGeneIDs object.
+        Get union of region or gene IDs in the current RegionOrGeneIDs object and in
+        the other RegionOrGeneIDs object.
 
         :param other: RegionOrGeneIDs object
         :return: RegionOrGeneIDs object
@@ -350,9 +364,9 @@ class RegionOrGeneIDs:
         if not isinstance(other, RegionOrGeneIDs):
             return NotImplemented
 
-        assert (
-            self.type == other.type
-        ), "RegionOrGeneIDs objects are of a different type."
+        assert self.type == other.type, (
+            "RegionOrGeneIDs objects are of a different type."
+        )
 
         return RegionOrGeneIDs(
             region_or_gene_ids=sorted(
@@ -374,21 +388,22 @@ class RegionOrGeneIDs:
 
 class MotifOrTrackIDs:
     """
-    MotifOrTrackIDs class represents a unique sorted tuple of motif IDs or track IDs for constructing a Pandas
-    dataframe index for a cisTarget database.
+    MotifOrTrackIDs class represents a unique sorted tuple of motif IDs or track IDs
+    for constructing a Pandas dataframe index for a cisTarget database.
     """
 
     def __init__(
         self,
-        motif_or_track_ids: Union[List[str], Set[str], Tuple[str, ...]],
-        motifs_or_tracks_type: Union[MotifsOrTracksType, str],
+        motif_or_track_ids: list[str] | set[str] | tuple[str, ...],
+        motifs_or_tracks_type: MotifsOrTracksType | str,
     ) -> None:
         """
-        Create unique tuple of motif IDs or track IDs from a list, set or tuple of motif IDs or track IDs,
-        annotated with MotifsOrTracksType Enum.
+        Create unique tuple of motif IDs or track IDs from a list, set or tuple of
+        motif IDs or track IDs, annotated with MotifsOrTracksType Enum.
 
         :param motif_or_track_ids: list, set or tuple of motif IDs or track IDs.
-        :param motifs_or_tracks_type: MotifsOrTracksType.MOTIFS ("motifs") or MotifsOrTracksType.TRACKS ("tracks").
+        :param motifs_or_tracks_type: MotifsOrTracksType.MOTIFS ("motifs") or
+            MotifsOrTracksType.TRACKS ("tracks").
         """
         if isinstance(motifs_or_tracks_type, str):
             motifs_or_tracks_type = MotifsOrTracksType.from_str(motifs_or_tracks_type)
@@ -427,13 +442,13 @@ class MotifOrTrackIDs:
     def __len__(self) -> int:
         return len(self.ids)
 
-    def __getitem__(self, items) -> "MotifOrTrackIDs":
+    def __getitem__(self, items: int | slice) -> MotifOrTrackIDs:
         if isinstance(items, int):
             return MotifOrTrackIDs((self.ids[items],), self.type)
 
         return MotifOrTrackIDs(self.ids[items], self.type)
 
-    def sort(self) -> "MotifOrTrackIDs":
+    def sort(self) -> MotifOrTrackIDs:
         """Sort motif IDs or track IDs."""
         return MotifOrTrackIDs(sorted(self.ids), self.type)
 
