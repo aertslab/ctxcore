@@ -8,7 +8,7 @@ TEST_SIGNATURE = "msigdb_cancer_c6"
 TEST_SIGNATURE_FNAME = resource_filename("resources.tests", "c6.all.v6.1.symbols.gmt")
 
 
-def test_init1():
+def test_init1() -> None:
     gs1 = GeneSignature(name="test1", gene2weight=["TP53", "SOX4"])
     assert "TP53" in gs1
     assert "SOX4" in gs1
@@ -18,7 +18,7 @@ def test_init1():
     assert gs1.gene2weight["SOX4"] == 1.0
 
 
-def test_init2():
+def test_init2() -> None:
     gs1 = GeneSignature(name="test1", gene2weight=[("TP53", 0.5), ("SOX4", 0.75)])
     assert "TP53" in gs1
     assert "SOX4" in gs1
@@ -28,7 +28,7 @@ def test_init2():
     assert gs1.gene2weight["SOX4"] == 0.75
 
 
-def test_init3():
+def test_init3() -> None:
     gs1 = GeneSignature(name="test1", gene2weight={"TP53": 0.5, "SOX4": 0.75})
     assert "TP53" in gs1
     assert "SOX4" in gs1
@@ -38,7 +38,7 @@ def test_init3():
     assert gs1.gene2weight["SOX4"] == 0.75
 
 
-def test_immut():
+def test_immut() -> None:
     gs1 = GeneSignature(name="test1", gene2weight={"TP53": 0.5, "SOX4": 0.75})
     with pytest.raises(attr.exceptions.FrozenInstanceError):
         gs1.name = "rename"
@@ -46,18 +46,18 @@ def test_immut():
         gs1.gene2weight["TP53"] = 0.6
 
 
-def test_genes():
+def test_genes() -> None:
     gs1 = GeneSignature(name="test1", gene2weight={"TP53": 0.5, "SOX4": 0.75})
     assert gs1.genes == ("SOX4", "TP53")
 
 
-def test_dict():
+def test_dict() -> None:
     gs1 = GeneSignature(name="test1", gene2weight={"TP53": 0.5, "SOX4": 0.75})
     assert gs1["TP53"] == 0.5
     assert gs1["SOX4"] == 0.75
 
 
-def test_rename():
+def test_rename() -> None:
     gs1 = GeneSignature(name="test1", gene2weight={"TP53": 0.5, "SOX4": 0.75})
     gs2 = gs1.rename("test2")
     assert "TP53" in gs2
@@ -68,7 +68,7 @@ def test_rename():
     assert gs2.gene2weight["SOX4"] == 0.75
 
 
-def test_union1():
+def test_union1() -> None:
     gs1 = GeneSignature(name="test1", gene2weight=["TP53", "SOX4"])
     gs2 = GeneSignature(name="test1", gene2weight=["TP53", "SOX2"])
     gsu = gs1.union(gs2)
@@ -78,7 +78,7 @@ def test_union1():
     assert len(gsu) == 3
 
 
-def test_union3():
+def test_union3() -> None:
     gs1 = GeneSignature(name="test1", gene2weight={"TP53": 0.8, "SOX4": 0.75})
     gs2 = GeneSignature(name="test1", gene2weight={"TP53": 0.3, "SOX2": 0.60})
     gsu = gs1.union(gs2)
@@ -91,7 +91,7 @@ def test_union3():
     assert len(gsu) == 3
 
 
-def test_diff1():
+def test_diff1() -> None:
     gs1 = GeneSignature(name="test1", gene2weight=["TP53", "SOX4"])
     gs2 = GeneSignature(name="test1", gene2weight=["TP53", "SOX2"])
     gsu = gs1.difference(gs2)
@@ -99,7 +99,7 @@ def test_diff1():
     assert len(gsu) == 1
 
 
-def test_diff3():
+def test_diff3() -> None:
     gs1 = GeneSignature(name="test1", gene2weight={"TP53": 0.8, "SOX4": 0.75})
     gs2 = GeneSignature(name="test1", gene2weight={"TP53": 0.3, "SOX2": 0.60})
     gsu = gs1.difference(gs2)
@@ -108,7 +108,7 @@ def test_diff3():
     assert len(gsu) == 1
 
 
-def test_intersection1():
+def test_intersection1() -> None:
     gs1 = GeneSignature(name="test1", gene2weight=["TP53", "SOX4"])
     gs2 = GeneSignature(name="test1", gene2weight=["TP53", "SOX2"])
     gsu = gs1.intersection(gs2)
@@ -116,7 +116,7 @@ def test_intersection1():
     assert len(gsu) == 1
 
 
-def test_intersection3():
+def test_intersection3() -> None:
     gs1 = GeneSignature(name="test1", gene2weight={"TP53": 0.8, "SOX4": 0.75})
     gs2 = GeneSignature(name="test1", gene2weight={"TP53": 0.3, "SOX2": 0.60})
     gsu = gs1.intersection(gs2)
@@ -125,7 +125,7 @@ def test_intersection3():
     assert gsu.gene2weight["TP53"] == 0.8
 
 
-def test_regulon():
+def test_regulon() -> None:
     reg = Regulon(
         name="TP53 regulon",
         gene2weight={"TP53": 0.8, "SOX4": 0.75},
@@ -135,7 +135,7 @@ def test_regulon():
     assert reg.transcription_factor == "TP53"
 
 
-def test_load_gmt():
+def test_load_gmt() -> None:
     gss = GeneSignature.from_gmt(
         field_separator="\t", gene_separator="\t", fname=TEST_SIGNATURE_FNAME
     )
@@ -146,7 +146,7 @@ def test_load_gmt():
     assert len(gss[0]) == 29
 
 
-def test_add():
+def test_add() -> None:
     gss = GeneSignature.from_gmt(
         field_separator="\t", gene_separator="\t", fname=TEST_SIGNATURE_FNAME
     )
@@ -154,7 +154,7 @@ def test_add():
     assert "MEF2" in res
 
 
-def test_noweights():
+def test_noweights() -> None:
     gs1 = GeneSignature(name="test1", gene2weight={"TP53": 0.8, "SOX4": 0.75})
     gs2 = gs1.noweights()
     assert gs1["TP53"] == 0.8
@@ -172,7 +172,7 @@ def test_noweights():
     assert isinstance(reg2, Regulon)
 
 
-def test_head():
+def test_head() -> None:
     gs1 = GeneSignature(name="test1", gene2weight={"TP53": 0.8, "SOX4": 0.75})
     gs2 = gs1.head(1)
     assert gs2["TP53"] == 0.8

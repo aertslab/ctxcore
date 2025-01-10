@@ -9,7 +9,7 @@ from ctxcore.datatypes import (
 )
 
 
-def test_RegionsOrGenesType_from_str():
+def test_RegionsOrGenesType_from_str() -> None:
     """Check if a member of RegionsOrGenesType Enum can be made from a string."""
     assert RegionsOrGenesType.from_str("regions") == RegionsOrGenesType.REGIONS
     assert RegionsOrGenesType.from_str("REGIONS") == RegionsOrGenesType.REGIONS
@@ -23,7 +23,7 @@ def test_RegionsOrGenesType_from_str():
         RegionsOrGenesType.from_str("NON_EXISTING_REGIONS_OR_TRACKS_TYPE")
 
 
-def test_MotifsOrTracksType_from_str():
+def test_MotifsOrTracksType_from_str() -> None:
     """Check if a member of MotifsOrTracksType Enum can be made from a string."""
     assert MotifsOrTracksType.from_str("motifs") == MotifsOrTracksType.MOTIFS
     assert MotifsOrTracksType.from_str("MOTIFS") == MotifsOrTracksType.MOTIFS
@@ -37,7 +37,7 @@ def test_MotifsOrTracksType_from_str():
         MotifsOrTracksType.from_str("NON_EXISTING_MOTIFS_OR_TRACKS_TYPE")
 
 
-def test_ScoresOrRankingsType_from_str():
+def test_ScoresOrRankingsType_from_str() -> None:
     """Check if a member of ScoresOrRankingsType Enum can be made from a string."""
     assert ScoresOrRankingsType.from_str("scores") == ScoresOrRankingsType.SCORES
     assert ScoresOrRankingsType.from_str("SCORES") == ScoresOrRankingsType.SCORES
@@ -51,7 +51,7 @@ def test_ScoresOrRankingsType_from_str():
         ScoresOrRankingsType.from_str("NON_EXISTING_SCORES_OR_TRACK_TYPE")
 
 
-def test_RegionOrGeneIDs_with_regions():
+def test_RegionOrGeneIDs_with_regions() -> None:
     """Check if a RegionOrGeneIDs object can be constructed from a list of region IDs."""
     region_or_gene_ids_instance = RegionOrGeneIDs(
         region_or_gene_ids=["reg2", "reg1", "reg6", "reg2"],
@@ -65,7 +65,7 @@ def test_RegionOrGeneIDs_with_regions():
     assert len(region_or_gene_ids_instance) == 3
 
 
-def test_RegionOrGeneIDs_with_genes():
+def test_RegionOrGeneIDs_with_genes() -> None:
     """Check if a RegionOrGeneIDs object can be constructed from a set of gene IDs."""
     region_or_gene_ids_instance = RegionOrGeneIDs(
         region_or_gene_ids={"gene2", "gene1", "gene6"},
@@ -79,7 +79,7 @@ def test_RegionOrGeneIDs_with_genes():
     assert len(region_or_gene_ids_instance) == 3
 
 
-def test_RegionOrGeneIDs_with_regions_or_genes_type_str():
+def test_RegionOrGeneIDs_with_regions_or_genes_type_str() -> None:
     """
     Check if a RegionOrGeneIDs object can be constructed from a tuple of gene IDs where regions_or_genes_type is given
     as a string.
@@ -96,7 +96,7 @@ def test_RegionOrGeneIDs_with_regions_or_genes_type_str():
     assert len(region_or_gene_ids_instance) == 3
 
 
-def test_RegionOrGeneIDs_subset_superset():
+def test_RegionOrGeneIDs_subset_superset() -> None:
     """
     Check if region or gene IDs of a RegionOrGeneIDs object are a subset or a superset of another RegionOrGeneIDs
     object.
@@ -114,7 +114,7 @@ def test_RegionOrGeneIDs_subset_superset():
     assert region_or_gene_ids_instance2.issuperset(region_or_gene_ids_instance1)
 
 
-def test_MotifsOrTracksIDs_with_motifs():
+def test_MotifsOrTracksIDs_with_motifs() -> None:
     """Check if a MotifOrTrackIDs object can be constructed from a list of motif IDs."""
     motif_or_track_ids_instance = MotifOrTrackIDs(
         motif_or_track_ids=["motif5", "motif10", "motif3", "motif10"],
@@ -128,7 +128,7 @@ def test_MotifsOrTracksIDs_with_motifs():
     assert len(motif_or_track_ids_instance) == 3
 
 
-def test_MotifsOrTracksIDs_with_tracks():
+def test_MotifsOrTracksIDs_with_tracks() -> None:
     """Check if a MotifOrTrackIDs object can be constructed from a set of track IDs."""
     motif_or_track_ids_instance = MotifOrTrackIDs(
         motif_or_track_ids={"track5", "track10", "track3"},
@@ -142,7 +142,7 @@ def test_MotifsOrTracksIDs_with_tracks():
     assert len(motif_or_track_ids_instance) == 3
 
 
-def test_MotifsOrTracksIDs_with_motifs_or_tracks_type_str():
+def test_MotifsOrTracksIDs_with_motifs_or_tracks_type_str() -> None:
     """
     Check if a MotifOrTrackIDs object can be constructed from a tuple of track IDs,
     where motifs_or_tracks_type is given as a string.

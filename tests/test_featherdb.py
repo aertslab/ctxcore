@@ -26,25 +26,25 @@ def gs():
     )[0]
 
 
-def test_init(db):
+def test_init(db) -> None:
     assert db.name == TEST_DATABASE_NAME
 
 
-def test_total_genes(db):
+def test_total_genes(db) -> None:
     assert db.total_genes == 22284
 
 
-def test_genes(db):
+def test_genes(db) -> None:
     assert len(db.genes) == 22284
 
 
-def test_load_full(db):
+def test_load_full(db) -> None:
     rankings = db.load_full()
     assert len(rankings.index) == 5
     assert len(rankings.columns) == 22284
 
 
-def test_load(db, gs):
+def test_load(db, gs) -> None:
     rankings = db.load(gs)
     assert len(rankings.index) == 5
     assert len(rankings.columns) == 29

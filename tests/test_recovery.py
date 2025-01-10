@@ -32,11 +32,11 @@ def gs():
     )[0]
 
 
-def test_enrichment(db, gs):
+def test_enrichment(db, gs) -> None:
     _df = enrichment(db, gs)
 
 
-def test_auc1d_1():
+def test_auc1d_1() -> None:
     # Check if AUC is calculated correctly when a gene is recovered at the rank threshold.
     # In the python implementation it should be included in the AUC calculation.
     # For the current gene list the non-normalized AUC should be: (2*1) + (2*2) + (2*3) + (1*4) = 16.
@@ -50,7 +50,7 @@ def test_auc1d_1():
     assert auc1d(ranking, auc_rank_threshold, auc_max) == 16.0 / 800
 
 
-def test_auc1d_2():
+def test_auc1d_2() -> None:
     # For the current gene list the non-normalized AUC should be: (2*1) + (2*2) + (3*3) = 15.
 
     total_genes = 100
@@ -62,7 +62,7 @@ def test_auc1d_2():
     assert auc1d(ranking, auc_rank_threshold, auc_max) == 15.0 / 800
 
 
-def test_weighted_auc1d():
+def test_weighted_auc1d() -> None:
     # CAVE: In python the ranking databases are 0-based. The only difference a 1-based system has on the calc
     # of the AUC is that in the latter the rank threshold would not be included. This has an influence on the
     # normalization factor max AUC but nothing else.
@@ -76,7 +76,7 @@ def test_weighted_auc1d():
     assert weighted_auc1d(ranking, weights, auc_rank_threshold, auc_max) == 15.0
 
 
-def test_weighted_auc1d_batch():
+def test_weighted_auc1d_batch() -> None:
     # The assumption taken here is that for weights uniformly being set to 1.0,
     # auc1d and weighted_auc1d should always have the same output.
 
@@ -94,7 +94,7 @@ def test_weighted_auc1d_batch():
         )
 
 
-def test_weighted_rcc2d_batch():
+def test_weighted_rcc2d_batch() -> None:
     # The assumption taken here is that for weights uniformly being set to 1.0,
     # auc1d and weighted_auc1d should always have the same output.
 
