@@ -81,8 +81,8 @@ def test_RegionOrGeneIDs_with_genes() -> None:
 
 def test_RegionOrGeneIDs_with_regions_or_genes_type_str() -> None:
     """
-    Check if a RegionOrGeneIDs object can be constructed from a tuple of gene IDs where regions_or_genes_type is given
-    as a string.
+    Check if a RegionOrGeneIDs object can be constructed from a tuple of gene IDs
+    where regions_or_genes_type is given as a string.
     """
     region_or_gene_ids_instance = RegionOrGeneIDs(
         region_or_gene_ids=("gene2", "gene1", "gene6", "gene2"),
@@ -98,8 +98,8 @@ def test_RegionOrGeneIDs_with_regions_or_genes_type_str() -> None:
 
 def test_RegionOrGeneIDs_subset_superset() -> None:
     """
-    Check if region or gene IDs of a RegionOrGeneIDs object are a subset or a superset of another RegionOrGeneIDs
-    object.
+    Check if region or gene IDs of a RegionOrGeneIDs object are a subset or a
+    superset of another RegionOrGeneIDs object.
     """
     region_or_gene_ids_instance1 = RegionOrGeneIDs(
         region_or_gene_ids=["reg1", "reg2", "reg6"],

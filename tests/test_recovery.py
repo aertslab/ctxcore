@@ -16,7 +16,7 @@ TEST_SIGNATURE_FNAME = resource_filename("resources.tests", "c6.all.v6.1.symbols
 
 
 @pytest.fixture
-def db():
+def db() -> RankingDatabase:
     return RankingDatabase(
         TEST_DATABASE_FNAME,
         TEST_DATABASE_NAME,
@@ -24,7 +24,7 @@ def db():
 
 
 @pytest.fixture
-def gs():
+def gs() -> GeneSignature:
     return GeneSignature.from_gmt(
         TEST_SIGNATURE_FNAME,
         gene_separator="\t",
@@ -32,14 +32,16 @@ def gs():
     )[0]
 
 
-def test_enrichment(db, gs) -> None:
+def test_enrichment(db: RankingDatabase, gs: GeneSignature) -> None:
     _df = enrichment(db, gs)
 
 
 def test_auc1d_1() -> None:
-    # Check if AUC is calculated correctly when a gene is recovered at the rank threshold.
+    # Check if AUC is calculated correctly when a gene is recovered at the rank
+    # threshold.
     # In the python implementation it should be included in the AUC calculation.
-    # For the current gene list the non-normalized AUC should be: (2*1) + (2*2) + (2*3) + (1*4) = 16.
+    # For the current gene list the non-normalized AUC should be:
+    #   (2*1) + (2*2) + (2*3) + (1*4) = 16.
 
     total_genes = 100
     # This rank threshold is inclusive.
@@ -51,7 +53,8 @@ def test_auc1d_1() -> None:
 
 
 def test_auc1d_2() -> None:
-    # For the current gene list the non-normalized AUC should be: (2*1) + (2*2) + (3*3) = 15.
+    # For the current gene list the non-normalized AUC should be:
+    #   (2*1) + (2*2) + (3*3) = 15.
 
     total_genes = 100
     # This rank threshold is inclusive.
@@ -63,9 +66,10 @@ def test_auc1d_2() -> None:
 
 
 def test_weighted_auc1d() -> None:
-    # CAVE: In python the ranking databases are 0-based. The only difference a 1-based system has on the calc
-    # of the AUC is that in the latter the rank threshold would not be included. This has an influence on the
-    # normalization factor max AUC but nothing else.
+    # CAVE: In python the ranking databases are 0-based. The only difference a 1-based
+    # system has on the calc of the AUC is that in the latter the rank threshold would
+    # not be included. This has an influence on the normalization factor max AUC but
+    # nothing else.
 
     auc_rank_threshold = 8
     # The databases have a zero-based ranking system.
@@ -101,7 +105,9 @@ def test_weighted_rcc2d_batch() -> None:
     N = 100000
     total_genes = 100
     for _ in range(N):
-        # rccs[row_idx, :] = np.cumsum(np.bincount(curranking, weights=weights)[:rank_threshold])
+        # rccs[row_idx, :] = np.cumsum(
+        #     np.bincount(curranking, weights=weights)[:rank_threshold]
+        # )
         # ValueError: could not broadcast input array from shape (89) into shape (97)
         auc_rank_threshold = np.random.randint(2, high=total_genes)
         n_genes = np.random.randint(20, high=total_genes)
