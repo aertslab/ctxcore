@@ -1,19 +1,26 @@
-import os
-from abc import ABCMeta, abstractmethod
-from typing import Set, Tuple
+from __future__ import annotations
 
-import pandas as pd
+from abc import ABCMeta, abstractmethod
+from pathlib import Path
+from typing import TYPE_CHECKING
+
 from cytoolz import memoize
 
 from ctxcore.ctdb import CisTargetDatabase
 from ctxcore.datatypes import RegionOrGeneIDs
-from ctxcore.genesig import GeneSignature
+
+if TYPE_CHECKING:
+    import pandas as pd
+
+    from ctxcore.genesig import GeneSignature
 
 
 class RankingDatabase(metaclass=ABCMeta):
     """
-    A class of a database of whole genome rankings. The whole genome is ranked for
-    regulatory features of interest, e.g. motifs for a transcription factor.
+    A class of a database of whole genome rankings.
+
+    The whole genome is ranked for regulatory features of interest,
+    e.g. motifs for a transcription factor.
 
     The rankings of the genes are 0-based.
     """
@@ -40,12 +47,12 @@ class RankingDatabase(metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def genes(self) -> Tuple[str]:
-        """List of genes ranked according to the regulatory features in this database."""
+    def genes(self) -> tuple[str]:
+        """List of genes ranked according to the regulatory features in this database."""  # noqa: W505
 
     @property
     @memoize
-    def geneset(self) -> Set[str]:
+    def geneset(self) -> set[str]:
         """Set of genes ranked according to the regulatory features in this database."""
         return set(self.genes)
 
@@ -64,7 +71,7 @@ class RankingDatabase(metaclass=ABCMeta):
 
         :param gs: The gene signature.
         :return: a dataframe.
-        """
+        """  # noqa: W505
 
     def __str__(self) -> str:
         """Returns a readable string representation."""
@@ -76,6 +83,15 @@ class RankingDatabase(metaclass=ABCMeta):
 
 
 class FeatherRankingDatabase(RankingDatabase):
+    """
+    A class of a Feather database of whole genome rankings.
+
+    The whole genome is ranked for regulatory features of interest,
+    e.g. motifs for a transcription factor.
+
+    The rankings of the genes are 0-based.
+    """
+
     def __init__(self, fname: str, name: str) -> None:
         """
         Create a new feather database.
@@ -85,7 +101,7 @@ class FeatherRankingDatabase(RankingDatabase):
         """
         super().__init__(name=name)
 
-        assert os.path.isfile(fname), f"""Database "{fname}" doesn't exist."""
+        assert Path(fname).is_file(), f"""Database "{fname}" doesn't exist."""
 
         self._fname = fname
         self.ct_db = CisTargetDatabase.init_ct_db(
@@ -99,7 +115,7 @@ class FeatherRankingDatabase(RankingDatabase):
 
     @property
     @memoize
-    def genes(self) -> Tuple[str]:
+    def genes(self) -> tuple[str]:
         return self.ct_db.all_region_or_gene_ids.ids
 
     def load_full(self) -> pd.DataFrame:
@@ -108,7 +124,8 @@ class FeatherRankingDatabase(RankingDatabase):
         )
 
     def load(self, gs: GeneSignature) -> pd.DataFrame:
-        # For some genes in the signature there might not be a rank available in the database.
+        # For some genes in the signature there might not be a rank available in the
+        # database.
         gene_set = self.geneset.intersection(set(gs.genes))
 
         return self.ct_db.subset_to_pandas(
@@ -133,7 +150,7 @@ class MemoryDecorator(RankingDatabase):
         return self._db.total_genes
 
     @property
-    def genes(self) -> Tuple[str]:
+    def genes(self) -> tuple[str]:
         return self._db.genes
 
     def load_full(self) -> pd.DataFrame:
@@ -151,10 +168,10 @@ def opendb(fname: str, name: str) -> RankingDatabase:
     :param name: The name of the database.
     :return: A ranking database.
     """
-    assert os.path.isfile(fname), f'"{fname}" does not exist.'
+    assert Path(fname).is_file(), f'"{fname}" does not exist.'
     assert name, "A database should be given a proper name."
 
-    extension = os.path.splitext(fname)[1]
+    extension = Path(fname).suffix
     if extension == ".feather":
         # noinspection PyTypeChecker
         return FeatherRankingDatabase(fname, name=name)
