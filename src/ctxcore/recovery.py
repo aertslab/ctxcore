@@ -291,7 +291,7 @@ def leading_edge4row(
 @jit(nopython=True)
 def auc1d(ranking: np.ndarray, rank_cutoff: int, max_auc: float) -> int:
     """
-    Calculate the AUC of the recovery curve of a single ranking. [DEPRECATED]
+    Calculate the AUC of the recovery curve of a single ranking. [DEPRECATED].
 
     :param ranking: The rank numbers of the genes.
     :param rank_cutoff: The maximum rank to take into account when calculating the AUC.

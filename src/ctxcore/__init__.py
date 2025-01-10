@@ -1,10 +1,8 @@
-"""
-Core functions for pycisTarget and the SCENIC tool suite
-"""
+"""Core functions for pycisTarget and the SCENIC tool suite."""
+
+import contextlib
 
 from pkg_resources import DistributionNotFound, get_distribution
 
-try:
+with contextlib.suppress(DistributionNotFound):
     __version__ = get_distribution("ctxcore").version
-except DistributionNotFound:
-    pass

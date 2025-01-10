@@ -18,7 +18,7 @@ class RankingDatabase(metaclass=ABCMeta):
     The rankings of the genes are 0-based.
     """
 
-    def __init__(self, name: str):
+    def __init__(self, name: str) -> None:
         """
         Create a new instance.
 
@@ -30,31 +30,23 @@ class RankingDatabase(metaclass=ABCMeta):
 
     @property
     def name(self) -> str:
-        """
-        The name of this database of rankings.
-        """
+        """The name of this database of rankings."""
         return self._name
 
     @property
     @abstractmethod
     def total_genes(self) -> int:
-        """
-        The total number of genes ranked.
-        """
+        """The total number of genes ranked."""
 
     @property
     @abstractmethod
     def genes(self) -> Tuple[str]:
-        """
-        List of genes ranked according to the regulatory features in this database.
-        """
+        """List of genes ranked according to the regulatory features in this database."""
 
     @property
     @memoize
     def geneset(self) -> Set[str]:
-        """
-        Set of genes ranked according to the regulatory features in this database.
-        """
+        """Set of genes ranked according to the regulatory features in this database."""
         return set(self.genes)
 
     @abstractmethod
@@ -74,21 +66,17 @@ class RankingDatabase(metaclass=ABCMeta):
         :return: a dataframe.
         """
 
-    def __str__(self):
-        """
-        Returns a readable string representation.
-        """
+    def __str__(self) -> str:
+        """Returns a readable string representation."""
         return self.name
 
-    def __repr__(self):
-        """
-        Returns a unambiguous string representation.
-        """
+    def __repr__(self) -> str:
+        """Returns a unambiguous string representation."""
         return f'{self.__class__.__name__}(name="{self._name}")'
 
 
 class FeatherRankingDatabase(RankingDatabase):
-    def __init__(self, fname: str, name: str):
+    def __init__(self, fname: str, name: str) -> None:
         """
         Create a new feather database.
 
@@ -132,11 +120,9 @@ class FeatherRankingDatabase(RankingDatabase):
 
 
 class MemoryDecorator(RankingDatabase):
-    """
-    A decorator for a ranking database which loads the entire database in memory.
-    """
+    """A decorator for a ranking database which loads the entire database in memory."""
 
-    def __init__(self, db: RankingDatabase):
+    def __init__(self, db: RankingDatabase) -> None:
         assert db, "Database should be supplied."
         self._db = db
         self._df = db.load_full()
@@ -173,4 +159,5 @@ def opendb(fname: str, name: str) -> RankingDatabase:
         # noinspection PyTypeChecker
         return FeatherRankingDatabase(fname, name=name)
     else:
-        raise ValueError(f'"{extension}" is an unknown extension.')
+        msg = f'"{extension}" is an unknown extension.'
+        raise ValueError(msg)

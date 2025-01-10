@@ -33,9 +33,7 @@ def openfile(filename: str, mode="r"):
 
 @attr.s(frozen=True)
 class GeneSignature(yaml.YAMLObject):
-    """
-    A class of gene signatures, i.e. a set of genes that are biologically related.
-    """
+    """A class of gene signatures, i.e. a set of genes that are biologically related."""
 
     yaml_tag = "!GeneSignature"
 
@@ -162,19 +160,19 @@ class GeneSignature(yaml.YAMLObject):
     @name.validator
     def name_validator(self, attribute, value) -> None:
         if len(value) == 0:
-            raise ValueError("A gene signature must have a non-empty name.")
+            msg = "A gene signature must have a non-empty name."
+            raise ValueError(msg)
 
     @gene2weight.validator
     def gene2weight_validator(self, attribute, value) -> None:
         if len(value) == 0:
-            raise ValueError("A gene signature must have at least one gene.")
+            msg = "A gene signature must have at least one gene."
+            raise ValueError(msg)
 
     @property
     @memoize
     def genes(self) -> Tuple[str, ...]:
-        """
-        Return genes in this signature. Genes are sorted in descending order according to weight.
-        """
+        """Return genes in this signature. Genes are sorted in descending order according to weight."""
         return tuple(
             map(first, sorted(self.gene2weight.items(), key=second, reverse=True))
         )
@@ -182,9 +180,7 @@ class GeneSignature(yaml.YAMLObject):
     @property
     @memoize
     def weights(self) -> Tuple[float, ...]:
-        """
-        Return the weights of the genes in this signature. Genes are sorted in descending order according to weight.
-        """
+        """Return the weights of the genes in this signature. Genes are sorted in descending order according to weight."""
         return tuple(
             map(second, sorted(self.gene2weight.items(), key=second, reverse=True))
         )
@@ -289,15 +285,11 @@ class GeneSignature(yaml.YAMLObject):
         )
 
     def noweights(self):
-        """
-        Create a new gene signature with uniform weights, i.e. all weights are equal and set to 1.0.
-        """
+        """Create a new gene signature with uniform weights, i.e. all weights are equal and set to 1.0."""
         return self.copy(gene2weight=self.genes)
 
     def head(self, n: int = 5) -> "GeneSignature":
-        """
-        Returns a gene signature with only the top n targets.
-        """
+        """Returns a gene signature with only the top n targets."""
         assert n >= 1, "n must be greater than or equal to one."
         genes = self.genes[
             0:n
@@ -314,38 +306,28 @@ class GeneSignature(yaml.YAMLObject):
         return float(len(ss.intersection(so))) / len(ss.union(so))
 
     def __len__(self) -> int:
-        """
-        The number of genes in this signature.
-        """
+        """The number of genes in this signature."""
         return len(self.genes)
 
     def __contains__(self, item: str) -> bool:
-        """
-        Checks if a gene is part of this signature.
-        """
-        return item in self.gene2weight.keys()
+        """Checks if a gene is part of this signature."""
+        return item in self.gene2weight
 
     def __getitem__(self, item: str) -> float:
-        """
-        Return the weight associated with a gene.
-        """
+        """Return the weight associated with a gene."""
         return self.gene2weight[item]
 
     def __str__(self) -> str:
-        """
-        Returns a readable string representation.
-        """
+        """Returns a readable string representation."""
         return f"[{','.join(self.genes)}]"
 
     def __repr__(self) -> str:
-        """
-        Returns an unambiguous string representation.
-        """
+        """Returns an unambiguous string representation."""
         return '{}(name="{}",gene2weight=[{}])'.format(
             self.__class__.__name__,
             self.name,
             "["
-            + ",".join(map(lambda g, w: f'("{g}",{w})', zip(self.genes, self.weights)))
+            + ",".join((f'("{g}",{w})' for g, w in zip(self.genes, self.weights)))
             + "]",
         )
 
@@ -392,9 +374,10 @@ class Regulon(GeneSignature, yaml.YAMLObject):
     annotation: str = attr.ib(default="")
 
     @transcription_factor.validator
-    def non_empty(self, attribute, value):
+    def non_empty(self, attribute, value) -> None:
         if len(value) == 0:
-            raise ValueError("A regulon must have a transcription factor.")
+            msg = "A regulon must have a transcription factor."
+            raise ValueError(msg)
 
     def metadata(self, field_separator: str = ",") -> str:
         return f"tf={self.transcription_factor}{field_separator}score={self.score}"

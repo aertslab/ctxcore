@@ -10,7 +10,10 @@ from sklearn import mixture
 
 
 def derive_threshold(
-    auc_mtx: pd.DataFrame, regulon_name: str, seed=None, method: str = "hdt"
+    auc_mtx: pd.DataFrame,
+    regulon_name: str,
+    seed: Optional[float] = None,
+    method: str = "hdt",
 ) -> float:
     """
     Derive threshold on the AUC values of the given regulon to binarize the cells in two clusters: "on" versus "off"
@@ -24,7 +27,8 @@ def derive_threshold(
         The BIC compares the BIC for two Gaussian Mixture Models: single versus two components.
     :return: The threshold on the AUC values.
     """
-    assert auc_mtx is not None and not auc_mtx.empty
+    assert auc_mtx is not None
+    assert not auc_mtx.empty
     assert regulon_name in auc_mtx.columns
     assert method in {"hdt", "bic"}
 
@@ -33,7 +37,7 @@ def derive_threshold(
     if seed:
         np.random.seed(seed=seed)
 
-    def isbimodal(data, method):
+    def isbimodal(data, method: str) -> bool:
         if method == "hdt":
             # Use Hartigan's dip statistic to decide if distribution deviates from unimodality.
             _, pval = diptst(
@@ -73,7 +77,7 @@ def derive_threshold(
 def binarize(
     auc_mtx: pd.DataFrame,
     threshold_overides: Optional[Mapping[str, float]] = None,
-    seed=None,
+    seed: Optional[float] = None,
     num_workers=1,
 ) -> (pd.DataFrame, pd.Series):
     """

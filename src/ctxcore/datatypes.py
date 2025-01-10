@@ -23,9 +23,8 @@ class RegionsOrGenesType(Enum):
         if regions_or_genes_type_instance:
             return regions_or_genes_type_instance
         else:
-            raise ValueError(
-                f'Unsupported RegionsOrGenesType "{regions_or_genes_type}".'
-            )
+            msg = f'Unsupported RegionsOrGenesType "{regions_or_genes_type}".'
+            raise ValueError(msg)
 
 
 @unique
@@ -48,9 +47,8 @@ class MotifsOrTracksType(Enum):
         if motifs_or_tracks_type_instance:
             return motifs_or_tracks_type_instance
         else:
-            raise ValueError(
-                f'Unsupported MotifsOrTracksType "{motifs_or_tracks_type}".'
-            )
+            msg = f'Unsupported MotifsOrTracksType "{motifs_or_tracks_type}".'
+            raise ValueError(msg)
 
 
 @unique
@@ -73,9 +71,8 @@ class ScoresOrRankingsType(Enum):
         if scores_or_rankings_type_instance:
             return scores_or_rankings_type_instance
         else:
-            raise ValueError(
-                f'Unsupported ScoresOrRankingsType "{scores_or_rankings_type}".'
-            )
+            msg = f'Unsupported ScoresOrRankingsType "{scores_or_rankings_type}".'
+            raise ValueError(msg)
 
 
 class RegionOrGeneIDs:
@@ -102,8 +99,8 @@ class RegionOrGeneIDs:
              regex for removing unwanted parts from the region ID to extract the gene ID.
         :return: RegionOrGeneIDs object for regions or genes.
         """
-        gene_ids = list()
-        region_ids = list()
+        gene_ids = []
+        region_ids = []
         gene_ids_set = set()
         region_ids_set = set()
 
@@ -113,9 +110,8 @@ class RegionOrGeneIDs:
                     columns = line.strip().split("\t")
 
                     if len(columns) < 4:
-                        raise ValueError(
-                            f'Error: BED file "{bed_filename:s}" has less than 4 columns.'
-                        )
+                        msg = f'Error: BED file "{bed_filename:s}" has less than 4 columns.'
+                        raise ValueError(msg)
 
                     # Get region ID from column 4 of the BED file.
                     region_id = columns[3]
@@ -132,9 +128,8 @@ class RegionOrGeneIDs:
                     else:
                         # Check if all region IDs only appear once.
                         if region_id in region_ids_set:
-                            raise ValueError(
-                                f'Error: region ID "{region_id:s}" is not unique in BED file "{bed_filename:s}".'
-                            )
+                            msg = f'Error: region ID "{region_id:s}" is not unique in BED file "{bed_filename:s}".'
+                            raise ValueError(msg)
                         else:
                             region_ids.append(region_id)
                             region_ids_set.add(region_id)
@@ -168,8 +163,8 @@ class RegionOrGeneIDs:
              regex for removing unwanted parts from the region ID to extract the gene ID.
         :return: RegionOrGeneIDs object for regions or genes.
         """
-        gene_ids = list()
-        region_ids = list()
+        gene_ids = []
+        region_ids = []
         gene_ids_set = set()
         region_ids_set = set()
 
@@ -191,9 +186,8 @@ class RegionOrGeneIDs:
                     else:
                         # Check if all region IDs only appear once.
                         if region_id in region_ids:
-                            raise ValueError(
-                                f'Error: region ID "{region_id:s}" is not unique in FASTA file "{fasta_filename:s}".'
-                            )
+                            msg = f'Error: region ID "{region_id:s}" is not unique in FASTA file "{fasta_filename:s}".'
+                            raise ValueError(msg)
                         else:
                             region_ids.append(region_id)
                             region_ids_set.add(region_id)
@@ -213,7 +207,7 @@ class RegionOrGeneIDs:
         self,
         region_or_gene_ids: Union[List[str], Set[str], Tuple[str, ...]],
         regions_or_genes_type: Union[RegionsOrGenesType, str],
-    ):
+    ) -> None:
         """
         Create unique tuple of region or gene IDs from a list, set or tuple of region or gene IDs,
         annotated with RegionsOrGenesType Enum.
@@ -343,9 +337,7 @@ class RegionOrGeneIDs:
         return self.ids_set.issuperset(other.ids_set)
 
     def sort(self) -> "RegionOrGeneIDs":
-        """
-        Sort region IDs or gene IDs.
-        """
+        """Sort region IDs or gene IDs."""
         return RegionOrGeneIDs(sorted(self.ids), self.type)
 
     def union(self, other: "RegionOrGeneIDs") -> "RegionOrGeneIDs":
@@ -390,7 +382,7 @@ class MotifOrTrackIDs:
         self,
         motif_or_track_ids: Union[List[str], Set[str], Tuple[str, ...]],
         motifs_or_tracks_type: Union[MotifsOrTracksType, str],
-    ):
+    ) -> None:
         """
         Create unique tuple of motif IDs or track IDs from a list, set or tuple of motif IDs or track IDs,
         annotated with MotifsOrTracksType Enum.
@@ -442,9 +434,7 @@ class MotifOrTrackIDs:
         return MotifOrTrackIDs(self.ids[items], self.type)
 
     def sort(self) -> "MotifOrTrackIDs":
-        """
-        Sort motif IDs or track IDs.
-        """
+        """Sort motif IDs or track IDs."""
         return MotifOrTrackIDs(sorted(self.ids), self.type)
 
     def has_motifs(self) -> bool:
