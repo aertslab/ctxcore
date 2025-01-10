@@ -18,7 +18,6 @@ class RegionsOrGenesType(Enum):
         :param regions_or_genes_type: 'regions' or 'genes'.
         :return: RegionsOrGenesType Enum member.
         """
-
         regions_or_genes_type = regions_or_genes_type.upper()
         regions_or_genes_type_instance = cls.__members__.get(regions_or_genes_type)
         if regions_or_genes_type_instance:
@@ -44,7 +43,6 @@ class MotifsOrTracksType(Enum):
         :param motifs_or_tracks_type: 'motifs' or 'tracks'.
         :return: MotifsOrTracksType Enum member.
         """
-
         motifs_or_tracks_type = motifs_or_tracks_type.upper()
         motifs_or_tracks_type_instance = cls.__members__.get(motifs_or_tracks_type)
         if motifs_or_tracks_type_instance:
@@ -70,7 +68,6 @@ class ScoresOrRankingsType(Enum):
         :param scores_or_rankings_type: 'scores' or 'rankings'.
         :return: ScoresOrRankingsType Enum member.
         """
-
         scores_or_rankings_type = scores_or_rankings_type.upper()
         scores_or_rankings_type_instance = cls.__members__.get(scores_or_rankings_type)
         if scores_or_rankings_type_instance:
@@ -105,13 +102,12 @@ class RegionOrGeneIDs:
              regex for removing unwanted parts from the region ID to extract the gene ID.
         :return: RegionOrGeneIDs object for regions or genes.
         """
-
         gene_ids = list()
         region_ids = list()
         gene_ids_set = set()
         region_ids_set = set()
 
-        with open(bed_filename, mode="r", encoding="utf-8") as fh:
+        with open(bed_filename, encoding="utf-8") as fh:
             for line in fh:
                 if line and not line.startswith("#"):
                     columns = line.strip().split("\t")
@@ -172,13 +168,12 @@ class RegionOrGeneIDs:
              regex for removing unwanted parts from the region ID to extract the gene ID.
         :return: RegionOrGeneIDs object for regions or genes.
         """
-
         gene_ids = list()
         region_ids = list()
         gene_ids_set = set()
         region_ids_set = set()
 
-        with open(fasta_filename, mode="r", encoding="utf-8") as fh:
+        with open(fasta_filename, encoding="utf-8") as fh:
             for line in fh:
                 if line.startswith(">"):
                     # Get region ID by getting everything after '>' up till the first whitespace.
@@ -226,7 +221,6 @@ class RegionOrGeneIDs:
         :param region_or_gene_ids: list, set or tuple of region or gene IDs.
         :param regions_or_genes_type: RegionsOrGenesType.REGIONS ("regions") or RegionsOrGenesType.GENES ("genes").
         """
-
         if isinstance(regions_or_genes_type, str):
             regions_or_genes_type = RegionsOrGenesType.from_str(regions_or_genes_type)
 
@@ -404,7 +398,6 @@ class MotifOrTrackIDs:
         :param motif_or_track_ids: list, set or tuple of motif IDs or track IDs.
         :param motifs_or_tracks_type: MotifsOrTracksType.MOTIFS ("motifs") or MotifsOrTracksType.TRACKS ("tracks").
         """
-
         if isinstance(motifs_or_tracks_type, str):
             motifs_or_tracks_type = MotifsOrTracksType.from_str(motifs_or_tracks_type)
 

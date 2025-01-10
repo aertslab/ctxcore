@@ -68,7 +68,7 @@ def test_RegionOrGeneIDs_with_regions():
 def test_RegionOrGeneIDs_with_genes():
     """Check if a RegionOrGeneIDs object can be constructed from a set of gene IDs."""
     region_or_gene_ids_instance = RegionOrGeneIDs(
-        region_or_gene_ids={"gene2", "gene1", "gene6", "gene2"},
+        region_or_gene_ids={"gene2", "gene1", "gene6"},
         regions_or_genes_type=RegionsOrGenesType.GENES,
     )
     assert region_or_gene_ids_instance.type == RegionsOrGenesType.GENES
@@ -131,7 +131,7 @@ def test_MotifsOrTracksIDs_with_motifs():
 def test_MotifsOrTracksIDs_with_tracks():
     """Check if a MotifOrTrackIDs object can be constructed from a set of track IDs."""
     motif_or_track_ids_instance = MotifOrTrackIDs(
-        motif_or_track_ids={"track5", "track10", "track3", "track10"},
+        motif_or_track_ids={"track5", "track10", "track3"},
         motifs_or_tracks_type=MotifsOrTracksType.TRACKS,
     )
     assert motif_or_track_ids_instance.type == MotifsOrTracksType.TRACKS

@@ -1,13 +1,10 @@
-# -*- coding: utf-8 -*-
-
 import numpy as np
 import pytest
 from pkg_resources import resource_filename
 
 from ctxcore.genesig import GeneSignature
-from ctxcore.recovery import auc1d
+from ctxcore.recovery import auc1d, rcc2d, weighted_auc1d
 from ctxcore.recovery import enrichment4features as enrichment
-from ctxcore.recovery import rcc2d, weighted_auc1d
 from ctxcore.rnkdb import FeatherRankingDatabase as RankingDatabase
 
 TEST_DATABASE_FNAME = resource_filename(
@@ -50,7 +47,7 @@ def test_auc1d_1():
     # The databases have a zero-based ranking system.
     ranking = np.asarray([2, 4, 6, 8]) - 1
     auc_max = auc_rank_threshold * total_genes
-    assert 16.0 / 800 == auc1d(ranking, auc_rank_threshold, auc_max)
+    assert auc1d(ranking, auc_rank_threshold, auc_max) == 16.0 / 800
 
 
 def test_auc1d_2():
@@ -62,7 +59,7 @@ def test_auc1d_2():
     # The databases have a zero-based ranking system.
     ranking = np.asarray([2, 4, 6]) - 1
     auc_max = auc_rank_threshold * total_genes
-    assert 15.0 / 800 == auc1d(ranking, auc_rank_threshold, auc_max)
+    assert auc1d(ranking, auc_rank_threshold, auc_max) == 15.0 / 800
 
 
 def test_weighted_auc1d():
@@ -76,7 +73,7 @@ def test_weighted_auc1d():
     weights = np.ones(len(ranking))
     # Disable normalization.
     auc_max = 1.0
-    assert 15.0 == weighted_auc1d(ranking, weights, auc_rank_threshold, auc_max)
+    assert weighted_auc1d(ranking, weights, auc_rank_threshold, auc_max) == 15.0
 
 
 def test_weighted_auc1d_batch():

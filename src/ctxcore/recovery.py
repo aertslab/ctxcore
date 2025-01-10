@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import logging
 from itertools import repeat
 from typing import List, Optional, Tuple
@@ -36,7 +34,6 @@ def derive_rank_cutoff(
         creating a recovery curve.
     :return Rank cutoff.
     """
-
     if not rank_threshold:
         rank_threshold = total_genes - 1
 
@@ -71,7 +68,6 @@ def rcc2d(rankings: np.ndarray, weights: np.ndarray, rank_threshold: int) -> np.
         creating a recovery curve.
     :return: Recovery curves (n_features, rank_threshold).
     """
-
     n_features = rankings.shape[0]
     rccs = np.empty(shape=(n_features, rank_threshold))  # Pre-allocation.
     for row_idx in range(n_features):
@@ -103,7 +99,6 @@ def recovery(
     :return: A tuple of numpy arrays. The first array contains the recovery curves (n_features/n_cells x rank_threshold),
         the second array the AUC values (n_features/n_cells).
     """
-
     rank_cutoff = derive_rank_cutoff(auc_threshold, total_genes, rank_threshold)
     features, _genes, rankings = rnk.index.values, rnk.columns.values, rnk.values
     weights = np.insert(weights, len(weights), 0.0)
@@ -141,7 +136,6 @@ def enrichment4cells(
         Area Under the recovery Curve.
     :return:
     """
-
     total_genes = len(rnk_mtx.columns)
     index = pd.MultiIndex.from_tuples(
         list(zip(rnk_mtx.index.values, repeat(regulon.name))), names=["Cell", "Regulon"]

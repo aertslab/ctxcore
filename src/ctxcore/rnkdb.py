@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import os
 from abc import ABCMeta, abstractmethod
 from typing import Set, Tuple
@@ -43,7 +41,6 @@ class RankingDatabase(metaclass=ABCMeta):
         """
         The total number of genes ranked.
         """
-        pass
 
     @property
     @abstractmethod
@@ -51,7 +48,6 @@ class RankingDatabase(metaclass=ABCMeta):
         """
         List of genes ranked according to the regulatory features in this database.
         """
-        pass
 
     @property
     @memoize
@@ -68,7 +64,6 @@ class RankingDatabase(metaclass=ABCMeta):
 
         :return: a dataframe.
         """
-        pass
 
     @abstractmethod
     def load(self, gs: GeneSignature) -> pd.DataFrame:
@@ -78,7 +73,6 @@ class RankingDatabase(metaclass=ABCMeta):
         :param gs: The gene signature.
         :return: a dataframe.
         """
-        pass
 
     def __str__(self):
         """

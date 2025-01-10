@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import re
 import sys
 from pathlib import Path
@@ -33,7 +31,6 @@ def is_feather_v1_or_v2(feather_filename: Union[Path, str]) -> Optional[int]:
     :param feather_filename: Feather v1 or v2 filename.
     :return: 1 (for Feather version 1), 2 (for Feather version 2) or None.
     """
-
     with open(feather_filename, "rb") as fh_feather:
         # Read first 6 and last 6 bytes to see if we have a Feather v2 file.
         fh_feather.seek(0, 0)
@@ -68,7 +65,6 @@ def get_ct_db_type_from_ct_db_filename(
     :return:
         scores_or_rankings, column_kind, row_kind
     """
-
     if not isinstance(ct_db_filename, Path):
         ct_db_filename = Path(ct_db_filename)
 
@@ -128,9 +124,7 @@ class CisTargetDatabase:
     @staticmethod
     def init_ct_db(
         ct_db_filename: Union[Path, str],
-        engine: Union[
-            str, Literal["polars"], Literal["polars_pyarrow"], Literal["pyarrow"]
-        ] = "polars",
+        engine: Union[Literal["polars", "polars_pyarrow", "pyarrow"], str] = "polars",
     ):
         """
         Create a CisTargetDatabase class by providing a cisTarget scores or rankings database file.
@@ -151,7 +145,6 @@ class CisTargetDatabase:
 
         :return: CisTargetDatabase object for regions or genes.
         """
-
         if not isinstance(ct_db_filename, Path):
             ct_db_filename = Path(ct_db_filename)
 
@@ -342,9 +335,7 @@ class CisTargetDatabase:
         motif_or_track_ids: MotifOrTrackIDs,
         scores_or_rankings: ScoresOrRankingsType,
         dtype: Type[Union[np.int16, np.int32, np.float32]],
-        engine: Union[
-            str, Literal["polars"], Literal["polars_pyarrow"], Literal["pyarrow"]
-        ] = "polars",
+        engine: Union[Literal["polars", "polars_pyarrow", "pyarrow"], str] = "polars",
     ):
         """
         Create cisTargetDatabase object.
@@ -372,7 +363,7 @@ class CisTargetDatabase:
 
         # Polars dataframe or pyarrow Table with scores or rankings for those region IDs or gene IDs that where loaded
         # with cisTargetDatabase.prefetch(). This acts as a cache.
-        self.df_cached: Optional[Union["pl.DataFrame", pa.Table]] = None
+        self.df_cached: Optional[Union[pl.DataFrame, pa.Table]] = None
 
         # Keep track for which region IDs or gene IDs, scores or rankings are loaded with cisTargetDatabase.prefetch().
         self.region_or_gene_ids_loaded: Optional[RegionOrGeneIDs] = None
@@ -391,7 +382,7 @@ class CisTargetDatabase:
             f"    all_region_or_gene_ids={all_regions_or_gene_ids_formatted},\n"
             f"    all_motif_or_track_ids={all_motif_or_track_ids_formatted},\n"
             f"    scores_or_rankings={self.scores_or_rankings},\n"
-            f"    dtype=np.{str(np.dtype(self.dtype))},\n"
+            f"    dtype=np.{np.dtype(self.dtype)!s},\n"
             f"    engine={self.engine}\n"
             ")"
         )
@@ -399,11 +390,11 @@ class CisTargetDatabase:
     def __repr__(self) -> str:
         return (
             f"CisTargetDatabase(\n"
-            f"    ct_db_filename={repr(self.ct_db_filename)},\n"
-            f"    all_region_or_gene_ids={repr(self.all_region_or_gene_ids)},\n"
-            f"    all_motif_or_track_ids={repr(self.all_motif_or_track_ids)},\n"
-            f"    scores_or_rankings={str(self.scores_or_rankings)},\n"
-            f"    dtype=np.{str(np.dtype(self.dtype))},\n"
+            f"    ct_db_filename={self.ct_db_filename!r},\n"
+            f"    all_region_or_gene_ids={self.all_region_or_gene_ids!r},\n"
+            f"    all_motif_or_track_ids={self.all_motif_or_track_ids!r},\n"
+            f"    scores_or_rankings={self.scores_or_rankings!s},\n"
+            f"    dtype=np.{np.dtype(self.dtype)!s},\n"
             f"    engine={self.engine}\n"
             ")"
         )
@@ -490,7 +481,6 @@ class CisTargetDatabase:
         """
         Remove prefetched scores or regions for region IDs or gene IDs from memory.
         """
-
         self.df_cached = None
         self.region_or_gene_ids_loaded = None
 
@@ -688,7 +678,7 @@ class CisTargetDatabase:
         self,
         region_or_gene_ids: RegionOrGeneIDs,
         engine: Optional[
-            Union[str, Literal["polars"], Literal["polars_pyarrow"], Literal["pyarrow"]]
+            Union[Literal["polars", "polars_pyarrow", "pyarrow"], str]
         ] = None,
         sort: bool = False,
     ):
@@ -748,7 +738,7 @@ class CisTargetDatabase:
         self,
         region_or_gene_ids: RegionOrGeneIDs,
         engine: Optional[
-            Union[str, Literal["polars"], Literal["polars_pyarrow"], Literal["pyarrow"]]
+            Union[Literal["polars", "polars_pyarrow", "pyarrow"], str]
         ] = None,
     ):
         """
@@ -770,7 +760,6 @@ class CisTargetDatabase:
               - `pyarrow`: Use `pyarrow.feather.read_table()` to read to pyarrow Table.
               - `None`: Use engine defined by `self.engine`.
         """
-
         (
             contains_all_input_gene_ids_or_regions_ids,
             found_region_or_gene_ids,

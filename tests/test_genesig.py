@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import attr
 import pytest
 from pkg_resources import resource_filename
