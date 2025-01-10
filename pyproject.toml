@@ -124,6 +124,11 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"src/ctxcore/genesig.py" = [
+  "D102", # Missing docstring in public method
+  "ANN001", # Missing type annotation for function argument
+  "ANN003", # Missing type annotation for
+]
 "src/ctxcore/rnkdb.py" = [
   "D102", # Missing docstring in public method
 ]
