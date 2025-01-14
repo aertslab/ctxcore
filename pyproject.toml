@@ -124,6 +124,11 @@ ignore = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"src/ctxcore/ctdb.py" = [
+  "D205", # 1 blank line required between summary line and description
+  "PYI051", # `Literal["x"]` is redundant in a union with `str`
+  "W505", # Doc line too long
+]
 "src/ctxcore/datatypes.py" = [
   "D102", # Missing docstring in public method
   "D205", # 1 blank line required between summary line and description

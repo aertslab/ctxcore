@@ -1,13 +1,11 @@
+from __future__ import annotations
+
 import contextlib
 import re
 from pathlib import Path
 from typing import (
     TYPE_CHECKING,
-    Literal,  # pragma: no cover
-    Optional,
-    Tuple,
-    Type,
-    Union,
+    Literal,
 )
 
 import numpy as np
@@ -28,14 +26,14 @@ if TYPE_CHECKING:
     import polars as pl
 
 
-def is_feather_v1_or_v2(feather_filename: Union[Path, str]) -> Optional[int]:
+def is_feather_v1_or_v2(feather_filename: Path | str) -> int | None:
     """
     Check if the passed filename is a Feather v1 or v2 file.
 
     :param feather_filename: Feather v1 or v2 filename.
     :return: 1 (for Feather version 1), 2 (for Feather version 2) or None.
     """
-    with open(feather_filename, "rb") as fh_feather:
+    with open(feather_filename, "rb") as fh_feather:  # noqa: PTH123
         # Read first 6 and last 6 bytes to see if we have a Feather v2 file.
         fh_feather.seek(0, 0)
         feather_v2_magic_bytes_header = fh_feather.read(6)
@@ -59,8 +57,8 @@ def is_feather_v1_or_v2(feather_filename: Union[Path, str]) -> Optional[int]:
 
 
 def get_ct_db_type_from_ct_db_filename(
-    ct_db_filename: Union[Path, str],
-) -> Tuple[str, str, str]:
+    ct_db_filename: Path | str,
+) -> tuple[str, str, str]:
     """
     Get cisTarget database type from cisTarget database filename.
 
@@ -72,9 +70,9 @@ def get_ct_db_type_from_ct_db_filename(
     if not isinstance(ct_db_filename, Path):
         ct_db_filename = Path(ct_db_filename)
 
-    scores_or_rankings: Optional[str] = None
-    column_kind: Optional[str] = None
-    row_kind: Optional[str] = None
+    scores_or_rankings: str | None = None
+    column_kind: str | None = None
+    row_kind: str | None = None
 
     for suffix in ct_db_filename.suffixes:
         # Remove the leading ".".
@@ -127,24 +125,27 @@ class CisTargetDatabase:
 
     @staticmethod
     def init_ct_db(
-        ct_db_filename: Union[Path, str],
-        engine: Union[Literal["polars", "polars_pyarrow", "pyarrow"], str] = "polars",
-    ):
+        ct_db_filename: Path | str,
+        engine: Literal["polars", "polars_pyarrow", "pyarrow"] | str = "polars",
+    ) -> CisTargetDatabase:
         """
         Create a CisTargetDatabase class by providing a cisTarget scores or rankings database file.
 
         This will:
           - get all gene IDs or region IDs available in the cisTarget database.
           - get all motif IDs or track IDs available in the cisTarget database.
-          - get the cisTarget database kind (genes or regions, motif or tracks, scores or regions).
+          - get the cisTarget database kind (genes or regions, motif or tracks, scores
+            or regions).
           - dtype used to store the scores or rankings.
 
         :param ct_db_filename:
             Path to cisTarget Feather scores or rankings database.
         :param engine:
             Engine to use when reading from cisTarget Feather database file:
-              - `polars`: Use `pl.read_ipc(..., use_pyarrow=False)` to read to Polars dataframe.
-              - `polars_pyarrow`: Use `pl.read_ipc(..., use_pyarrow=True)` to read to Polars dataframe.
+              - `polars`: Use `pl.read_ipc(..., use_pyarrow=False)` to read to Polars
+                dataframe.
+              - `polars_pyarrow`: Use `pl.read_ipc(..., use_pyarrow=True)` to read to
+                Polars dataframe.
               - `pyarrow`: Use `pyarrow.feather.read_table()` to read to pyarrow Table.
 
         :return: CisTargetDatabase object for regions or genes.
@@ -176,23 +177,26 @@ class CisTargetDatabase:
         # cisTarget Feather database is in v2 format.
 
         if use_pyarrow:
-            # Get column names from cisTarget Feather file with pyarrow without loading the whole database.
+            # Get column names from cisTarget Feather file with pyarrow without loading
+            # the whole database.
             schema = ds.dataset(ct_db_filename, format="feather").schema
             column_names = schema.names
             dtypes = schema.types
         else:
             import polars as pl
 
-            # Get column names from cisTarget Feather file with polars without loading the whole database.
+            # Get column names from cisTarget Feather file with polars without loading
+            # the whole database.
             schema = pl.read_ipc_schema(file=ct_db_filename)
             column_names = list(schema.keys())
             dtypes = list(schema.values())
 
-        index_column_idx: Optional[int] = None
-        index_column_name: Optional[str] = None
+        index_column_idx: int | None = None
+        index_column_name: str | None = None
 
-        # Get database index column ("motifs", "tracks", "regions" or "genes" depending of the database type).
-        # Start with the last column (as the index column normally should be the latest).
+        # Get database index column ("motifs", "tracks", "regions" or "genes" depending
+        # on the database type). Start with the last column (as the index column
+        # normally should be the latest).
         for column_idx, column_name in zip(
             range(len(column_names) - 1, -1, -1), column_names[::-1]
         ):
@@ -248,7 +252,7 @@ class CisTargetDatabase:
             raise ValueError(msg)
 
         column_dtype = column_dtype[0]
-        dtype: Union[Type[np.int16], Type[np.int32], Type[np.float32]]
+        dtype: type[np.int16 | np.int32 | np.float32]
 
         if use_pyarrow:
             if column_dtype == pa.int16():
@@ -336,8 +340,8 @@ class CisTargetDatabase:
         region_or_gene_ids: RegionOrGeneIDs,
         motif_or_track_ids: MotifOrTrackIDs,
         scores_or_rankings: ScoresOrRankingsType,
-        dtype: Type[Union[np.int16, np.int32, np.float32]],
-        engine: Union[Literal["polars", "polars_pyarrow", "pyarrow"], str] = "polars",
+        dtype: type[np.int16 | np.int32 | np.float32],
+        engine: Literal["polars", "polars_pyarrow", "pyarrow"] | str = "polars",
     ) -> None:
         """
         Create cisTargetDatabase object.
@@ -350,7 +354,7 @@ class CisTargetDatabase:
         self.all_region_or_gene_ids: RegionOrGeneIDs = region_or_gene_ids
         self.all_motif_or_track_ids: MotifOrTrackIDs = motif_or_track_ids
         self.scores_or_rankings: ScoresOrRankingsType = scores_or_rankings
-        self.dtype: Type[Union[np.int16, np.int32, np.float32]] = dtype
+        self.dtype: type[np.int16 | np.int32 | np.float32] = dtype
         self.engine = engine
 
         # Count number of region IDs or gene IDs.
@@ -361,12 +365,14 @@ class CisTargetDatabase:
         with contextlib.suppress(ImportError):
             pass
 
-        # Polars dataframe or pyarrow Table with scores or rankings for those region IDs or gene IDs that where loaded
-        # with cisTargetDatabase.prefetch(). This acts as a cache.
-        self.df_cached: Optional[Union[pl.DataFrame, pa.Table]] = None
+        # Polars dataframe or pyarrow Table with scores or rankings for those region IDs
+        # or gene IDs that where loaded with cisTargetDatabase.prefetch().
+        # This acts as a cache.
+        self.df_cached: pl.DataFrame | pa.Table | None = None
 
-        # Keep track for which region IDs or gene IDs, scores or rankings are loaded with cisTargetDatabase.prefetch().
-        self.region_or_gene_ids_loaded: Optional[RegionOrGeneIDs] = None
+        # Keep track for which region IDs or gene IDs, scores or rankings are loaded
+        # with cisTargetDatabase.prefetch().
+        self.region_or_gene_ids_loaded: RegionOrGeneIDs | None = None
 
     def __str__(self) -> str:
         all_regions_or_gene_ids_formatted = "\n    ".join(
@@ -401,32 +407,32 @@ class CisTargetDatabase:
 
     @property
     def is_genes_db(self) -> bool:
-        """Is cisTarget database a gene-based database?"""
+        """Is cisTarget database a gene-based database?"""  # noqa: D400
         return self.all_region_or_gene_ids.type == RegionsOrGenesType.GENES
 
     @property
     def is_regions_db(self) -> bool:
-        """Is cisTarget database a region-based database?"""
+        """Is cisTarget database a region-based database?"""  # noqa: D400
         return self.all_region_or_gene_ids.type == RegionsOrGenesType.REGIONS
 
     @property
     def is_motifs_db(self) -> bool:
-        """Is cisTarget database a motif-based database?"""
+        """Is cisTarget database a motif-based database?"""  # noqa: D400
         return self.all_motif_or_track_ids.type == MotifsOrTracksType.MOTIFS
 
     @property
     def is_tracks_db(self) -> bool:
-        """Is cisTarget database a track-based database?"""
+        """Is cisTarget database a track-based database?"""  # noqa: D400
         return self.all_motif_or_track_ids.type == MotifsOrTracksType.TRACKS
 
     @property
     def is_scores_db(self) -> bool:
-        """Does cisTarget database contain scores?"""
+        """Does cisTarget database contain scores?"""  # noqa: D400
         return self.scores_or_rankings == ScoresOrRankingsType.SCORES
 
     @property
     def is_rankings_db(self) -> bool:
-        """Does cisTarget database contain rankings?"""
+        """Does cisTarget database contain rankings?"""  # noqa: D400
         return self.scores_or_rankings == ScoresOrRankingsType.RANKINGS
 
     @property
@@ -441,12 +447,12 @@ class CisTargetDatabase:
 
     def has_all_region_or_gene_ids(
         self, region_or_gene_ids: RegionOrGeneIDs
-    ) -> Tuple[bool, RegionOrGeneIDs, RegionOrGeneIDs]:
+    ) -> tuple[bool, RegionOrGeneIDs, RegionOrGeneIDs]:
         """
         Check if all input region IDs or gene IDs are found in the cisTarget database.
 
         :param region_or_gene_ids: RegionOrGeneIDs object
-        :return all found, found region IDs or gene IDs, not found egion IDs or gene IDs
+        :return all found, found region IDs or gene IDs, not found region IDs or gene IDs
         """
         if region_or_gene_ids.issubset(self.all_region_or_gene_ids):
             return (
@@ -467,19 +473,26 @@ class CisTargetDatabase:
         self.region_or_gene_ids_loaded = None
 
     def _prefetch_as_polars_dataframe(
-        self, region_or_gene_ids: RegionOrGeneIDs, use_pyarrow: bool, sort: bool = False
+        self,
+        region_or_gene_ids: RegionOrGeneIDs,
+        *,
+        use_pyarrow: bool,
+        sort: bool = False,
     ) -> None:
         """
-        Fetch scores or rankings for input region IDs or gene IDs from cisTarget database file for region IDs or
-        gene IDs which were not prefetched in previous calls.
+        Fetch scores or rankings for input region IDs or gene IDs from cisTarget
+        database file for region IDs or gene IDs which were not prefetched in previous
+        calls.
 
-        All prefetched scores or rankings are stored as a polars Dataframe in self.df_cached, so they do not need to be
-        retrieved again from disk later if the same region IDs or gene IDs are requested.
+        All prefetched scores or rankings are stored as a polars Dataframe in
+        `self.df_cached`, so they do not need to be retrieved again from disk later if
+        the same region IDs or gene IDs are requested.
 
         :param region_or_gene_ids:
             Input region IDs or gene IDs to load from the cisTarget database file.
         :param use_pyarrow:
-            Use pyarrow to read from Feather file or use polars native reader: `pl.read_ipc(..., use_pyarrow=...)`.
+            Use pyarrow to read from Feather file or use polars native reader:
+            `pl.read_ipc(..., use_pyarrow=...)`.
         :param sort:
             Sort region IDs or gene IDs columns in self.df_cache.
         """
@@ -496,14 +509,15 @@ class CisTargetDatabase:
         import polars as pl
 
         if self.df_cached and isinstance(self.df_cached, pa.Table):
-            # Convert pyarrow Table to polars Dataframe (in case engine="pyarrow" was used before).
+            # Convert pyarrow Table to polars Dataframe (in case engine="pyarrow" was
+            # used before).
             self.df_cached = pl.from_arrow(self.df_cached, rechunk=False)
 
         if not self.df_cached:
             # No region IDs or gene IDs scores/rankings where loaded before.
 
-            # Get all found region IDs or gene IDs columns with scores/rankings and "motifs" or "track" column from
-            # cisTarget Feather file as a pyarrow Table.
+            # Get all found region IDs or gene IDs columns with scores/rankings and
+            # "motifs" or "track" column from cisTarget Feather file as a pyarrow Table.
             self.df_cached = pl.read_ipc(
                 file=self.ct_db_filename,
                 columns=(
@@ -530,15 +544,16 @@ class CisTargetDatabase:
                 )
                 raise ValueError(msg)
 
-            # Get region IDs or gene IDs subset for which no scores/rankings were loaded before.
+            # Get region IDs or gene IDs subset for which no scores/rankings were loaded
+            # before.
             region_or_gene_ids_to_load = found_region_or_gene_ids.difference(
                 self.region_or_gene_ids_loaded
             )
 
             # Check if new region IDs or gene IDs need to be loaded.
             if len(region_or_gene_ids_to_load) != 0:
-                # Get region IDs or gene IDs subset columns with scores/rankings from cisTarget Feather file as a
-                # polars DataFrame.
+                # Get region IDs or gene IDs subset columns with scores/rankings from
+                # cisTarget Feather file as a polars DataFrame.
                 self.df_cached.hstack(
                     columns=pl.read_ipc(
                         file=self.ct_db_filename,
@@ -555,7 +570,8 @@ class CisTargetDatabase:
                     self.region_or_gene_ids_loaded
                 )
 
-                # Store new pyarrow Table with previously and newly loaded region IDs or gene IDs scores/rankings.
+                # Store new pyarrow Table with previously and newly loaded region IDs or
+                # gene IDs scores/rankings.
                 self.df_cached = self.df_cached.select(
                     (
                         self.region_or_gene_ids_loaded.sort().ids
@@ -566,14 +582,16 @@ class CisTargetDatabase:
                 )
 
     def _prefetch_as_pyarrow_table(
-        self, region_or_gene_ids: RegionOrGeneIDs, sort=False
+        self, region_or_gene_ids: RegionOrGeneIDs, *, sort: bool = False
     ) -> None:
         """
-        Fetch scores or rankings for input region IDs or gene IDs from cisTarget database file for region IDs or
-        gene IDs which were not prefetched in previous calls.
+        Fetch scores or rankings for input region IDs or gene IDs from cisTarget
+        database file for region IDs or gene IDs which were not prefetched in previous
+        calls.
 
-        All prefetched scores or rankings are stored as a pyarrow Table in self.df_cached, so they do not need to be
-        retrieved again from disk later if the same region IDs or gene IDs are requested.
+        All prefetched scores or rankings are stored as a pyarrow Table in
+        `self.df_cached`, so they do not need to be retrieved again from disk later
+        if the same region IDs or gene IDs are requested.
 
         :param region_or_gene_ids:
             Input region IDs or gene IDs to load from the cisTarget database file.
@@ -591,10 +609,11 @@ class CisTargetDatabase:
             raise ValueError(msg)
 
         if not self.df_cached or not isinstance(self.df_cached, pa.Table):
-            # No region IDs or gene IDs scores/rankings where loaded before or cached version was a polars DataFrame.
+            # No region IDs or gene IDs scores/rankings where loaded before or cached
+            # version was a polars DataFrame.
 
-            # Get all found region IDs or gene IDs columns with scores/rankings and "motifs" or "track" column from
-            # cisTarget Feather file as a pyarrow Table.
+            # Get all found region IDs or gene IDs columns with scores/rankings and
+            # "motifs" or "track" column from cisTarget Feather file as a pyarrow Table.
             self.df_cached = pf.read_table(
                 source=self.ct_db_filename,
                 columns=(
@@ -618,15 +637,16 @@ class CisTargetDatabase:
                 )
                 raise ValueError(msg)
 
-            # Get region IDs or gene IDs subset for which no scores/rankings were loaded before.
+            # Get region IDs or gene IDs subset for which no scores/rankings were loaded
+            # before.
             region_or_gene_ids_to_load = found_region_or_gene_ids.difference(
                 self.region_or_gene_ids_loaded
             )
 
             # Check if new region IDs or gene IDs need to be loaded.
             if len(region_or_gene_ids_to_load) != 0:
-                # Get region IDs or gene IDs subset columns with scores/rankings from cisTarget Feather file as a
-                # pyarrow Table.
+                # Get region IDs or gene IDs subset columns with scores/rankings from
+                # cisTarget Feather file as a pyarrow Table.
                 pa_table_subset = pf.read_table(
                     source=self.ct_db_filename,
                     columns=region_or_gene_ids_to_load.ids,
@@ -634,11 +654,13 @@ class CisTargetDatabase:
                     use_threads=True,
                 )
 
-                # Get current loaded pyarrow Table to which the pa_table_subset data will be added.
+                # Get current loaded pyarrow Table to which the pa_table_subset data
+                # will be added.
                 pa_table = self.df_cached
 
                 for column in pa_table_subset.itercolumns():
-                    # Append column with region IDs or gene IDs scores/rankings to existing pyarrow Table.
+                    # Append column with region IDs or gene IDs scores/rankings to
+                    # existing pyarrow Table.
                     pa_table = pa_table.append_column(column._name, column)
 
                 # Keep track of loaded region IDs or gene IDs scores/rankings.
@@ -646,7 +668,8 @@ class CisTargetDatabase:
                     self.region_or_gene_ids_loaded
                 )
 
-                # Store new pyarrow Table with previously and newly loaded region IDs or gene IDs scores/rankings.
+                # Store new pyarrow Table with previously and newly loaded region IDs or
+                # gene IDs scores/rankings.
                 self.df_cached = pa_table.select(
                     (
                         self.region_or_gene_ids_loaded.sort().ids
@@ -659,25 +682,28 @@ class CisTargetDatabase:
     def prefetch(
         self,
         region_or_gene_ids: RegionOrGeneIDs,
-        engine: Optional[
-            Union[Literal["polars", "polars_pyarrow", "pyarrow"], str]
-        ] = None,
+        engine: Literal["polars", "polars_pyarrow", "pyarrow"] | str | None = None,
+        *,
         sort: bool = False,
     ) -> None:
         """
-        Fetch scores or rankings for input region IDs or gene IDs from cisTarget database file for region IDs or
-        gene IDs which were not prefetched in previous calls.
+        Fetch scores or rankings for input region IDs or gene IDs from cisTarget
+        database file for region IDs or gene IDs which were not prefetched in previous
+        calls.
 
-        All prefetched scores or rankings are stored in self.df_cached (as a polars DataFrame or pyarrow Table,
-        depending on the chosen engine), so they do not need to be retrieved again from disk later if the same region
-        IDs or gene IDs are requested.
+        All prefetched scores or rankings are stored in self.df_cached (as a polars
+        DataFrame or pyarrow Table, depending on the chosen engine), so they do not
+        need to be retrieved again from disk later if the same region IDs or gene IDs
+        are requested.
 
         :param region_or_gene_ids:
             Input region IDs or gene IDs to load from the cisTarget database file.
         :param engine:
             Engine to use when reading from cisTarget Feather database file:
-              - `polars`: Use `pl.read_ipc(..., use_pyarrow=False)` to read to Polars dataframe.
-              - `polars_pyarrow`: Use `pl.read_ipc(..., use_pyarrow=True)` to read to Polars dataframe.
+              - `polars`: Use `pl.read_ipc(..., use_pyarrow=False)` to read to Polars
+                dataframe.
+              - `polars_pyarrow`: Use `pl.read_ipc(..., use_pyarrow=True)` to read to
+                Polars dataframe.
               - `pyarrow`: Use `pyarrow.feather.read_table()` to read to pyarrow Table.
               - `None`: Use engine defined by `self.engine`.
         :param sort:
@@ -696,17 +722,20 @@ class CisTargetDatabase:
         engine = engine if engine else self.engine
 
         if engine == "polars":
-            # Store prefetched data as polars DataFrame (self.df_cached) and read data with polars' native IPC reader.
+            # Store prefetched data as polars DataFrame (self.df_cached) and read data
+            # with polars' native IPC reader.
             self._prefetch_as_polars_dataframe(
                 region_or_gene_ids=region_or_gene_ids, use_pyarrow=False, sort=sort
             )
         elif engine == "polars_pyarrow":
-            # Store prefetched data as polars DataFrame (self.df_cached) and read data with pyarrow's native IPC reader.
+            # Store prefetched data as polars DataFrame (self.df_cached) and read data
+            # with pyarrow's native IPC reader.
             self._prefetch_as_polars_dataframe(
                 region_or_gene_ids=region_or_gene_ids, use_pyarrow=True, sort=sort
             )
         elif engine == "pyarrow":
-            # Store prefetched data as pyarrow Table (self.df_cached) and read data with pyarrow's native IPC reader.
+            # Store prefetched data as pyarrow Table (self.df_cached) and read data
+            # with pyarrow's native IPC reader.
             self._prefetch_as_pyarrow_table(
                 region_or_gene_ids=region_or_gene_ids, sort=sort
             )
@@ -717,26 +746,28 @@ class CisTargetDatabase:
     def subset_to_pandas(
         self,
         region_or_gene_ids: RegionOrGeneIDs,
-        engine: Optional[
-            Union[Literal["polars", "polars_pyarrow", "pyarrow"], str]
-        ] = None,
-    ):
+        engine: Literal["polars", "polars_pyarrow", "pyarrow"] | str | None = None,
+    ) -> pd.DataFrame:
         """
-        Create Pandas dataframe of scores or rankings for input region IDs or gene IDs from cisTarget database file.
+        Create Pandas dataframe of scores or rankings for input region IDs or gene IDs
+        from cisTarget database file.
 
-        This calls `prefetch()` under the hood, which will cache previous retrieved scores or rankings for region IDs
-        or gene IDs, so in case the query contains region IDs or gene IDs that were retrieved before, those will not
-        be retrieved again from disk.
+        This calls `prefetch()` under the hood, which will cache previous retrieved
+        scores or rankings for region IDs or gene IDs, so in case the query contains
+        region IDs or gene IDs that were retrieved before, those will not be retrieved
+        again from disk.
 
-        All prefetched scores or rankings are stored in self.df_cached (as a polars DataFrame or pyarrow Table,
-        depending on the chosen engine).
+        All prefetched scores or rankings are stored in self.df_cached (as a polars
+        DataFrame or pyarrow Table, depending on the chosen engine).
 
         :param region_or_gene_ids:
             Input region IDs or gene IDs to load from the cisTarget database file.
         :param engine:
             Engine to use when reading from cisTarget Feather database file:
-              - `polars`: Use `pl.read_ipc(..., use_pyarrow=False)` to read to Polars dataframe.
-              - `polars_pyarrow`: Use `pl.read_ipc(..., use_pyarrow=True)` to read to Polars dataframe.
+              - `polars`: Use `pl.read_ipc(..., use_pyarrow=False)` to read to Polars
+                dataframe.
+              - `polars_pyarrow`: Use `pl.read_ipc(..., use_pyarrow=True)` to read to
+                Polars dataframe.
               - `pyarrow`: Use `pyarrow.feather.read_table()` to read to pyarrow Table.
               - `None`: Use engine defined by `self.engine`.
         """
@@ -752,8 +783,9 @@ class CisTargetDatabase:
 
         engine = engine if engine else self.engine
 
-        # Fetch scores or rankings for input region IDs or gene IDs from cisTarget database file for region IDs or
-        # gene IDs which were not prefetched in previous calls.
+        # Fetch scores or rankings for input region IDs or gene IDs from cisTarget
+        # database file for region IDs or gene IDs which were not prefetched in
+        # previous calls.
         self.prefetch(region_or_gene_ids=region_or_gene_ids, engine=engine, sort=True)
 
         if not self.df_cached:
@@ -765,8 +797,8 @@ class CisTargetDatabase:
             raise RuntimeError(msg)
 
         if engine == "pyarrow":
-            # Select input region IDs or gene IDs subset and motif or track column from pyarrow Table and convert to
-            # pandas DataFrame.
+            # Select input region IDs or gene IDs subset and motif or track column from
+            # pyarrow Table and convert to pandas DataFrame.
             pd_df = pd.DataFrame(
                 data=self.df_cached.select(
                     # Region IDs or gene IDs columns.
@@ -786,8 +818,8 @@ class CisTargetDatabase:
 
             return pd_df
         else:
-            # Convert input region IDs or gene IDs subset from polars Dataframe to numpy and construct a pandas
-            # Dataframe from it.
+            # Convert input region IDs or gene IDs subset from polars Dataframe to numpy
+            # and construct a pandas Dataframe from it.
             return pd.DataFrame(
                 data=self.df_cached.select(found_region_or_gene_ids.ids).to_numpy(),
                 columns=pd.Index(
