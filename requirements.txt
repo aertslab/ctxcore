@@ -1,3 +1,4 @@
+attrs
 cytoolz
 frozendict
 numba>=0.51.2
