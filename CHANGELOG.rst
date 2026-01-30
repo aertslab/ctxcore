@@ -6,6 +6,10 @@ Change Log
 Version History
 ---------------
 
+0.3.0
+    * Add binarize function from pySCENIC.
+    * Add aucell function from pySCENIC.
+
 0.2.0
     * Remove unused RankingsDatabase classes and conversion functions.
     * Add CisTargetDatabase class for reading rankings/scores for
