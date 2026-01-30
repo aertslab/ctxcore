@@ -15,8 +15,9 @@ from ctxcore.genesig import GeneSignature
 from ctxcore.recovery import enrichment4cells
 
 LOGGER = logging.getLogger(__name__)
-# To reduce the memory footprint of a ranking matrix we use unsigned 32bit integers which provides a range from 0
-# through 4,294,967,295. This should be sufficient even for region-based approaches.
+# To reduce the memory footprint of a ranking matrix we use unsigned 32bit integers
+# which provides a range from 0 through 4,294,967,295. This should be sufficient even
+# for region-based approaches.
 DTYPE = "uint32"
 DTYPE_C = c_uint32
 
@@ -25,23 +26,28 @@ def create_rankings(ex_mtx: pd.DataFrame, seed=None) -> pd.DataFrame:
     """
     Create a whole genome rankings dataframe from a single cell expression profile dataframe.
 
-    :param ex_mtx: The expression profile matrix. The rows should correspond to different cells, the columns to different
-        genes (n_cells x n_genes).
+    :param ex_mtx: The expression profile matrix. The rows should correspond to
+        different cells, the columns to different genes (n_cells x n_genes).
     :return: A genome rankings dataframe (n_cells x n_genes).
     """
     # Do a shuffle would be nice for exactly similar behaviour as R implementation.
     # 1. Ranks are assigned in the range of 1 to n, therefore we need to subtract 1.
-    # 2. In case of a tie the 'first' method is used, i.e. we keep the order in the original array. The remove any
-    #    bias we shuffle the dataframe before ranking it. This introduces a performance penalty!
-    # 3. Genes are ranked according to gene expression in descending order, i.e. from highly expressed (0) to low expression (n).
-    # 3. NAs should be given the highest rank numbers. Documentation is bad, so tested implementation via code snippet:
+    # 2. In case of a tie the 'first' method is used, i.e. we keep the order in the
+    #    original array. The remove any bias we shuffle the dataframe before ranking
+    #    it. This introduces a performance penalty!
+    # 3. Genes are ranked according to gene expression in descending order,
+    #    i.e. from highly expressed (0) to low expression (n).
+    # 3. NAs should be given the highest rank numbers. Documentation is bad, so tested
+    #    implementation via code snippet:
     #
     #    import pandas as pd
     #    import numpy as np
     #    df = pd.DataFrame(data=[4, 1, 3, np.nan, 2, 3], columns=['values'])
-    #    # Run below statement multiple times to see effect of shuffling in case of a tie.
-    #    df.sample(frac=1.0, replace=False).rank(ascending=False, method='first', na_option='bottom').sort_index() - 1
-    #
+    #    # Run below statement multiple times to see effect of shuffling in case of a
+    #    # tie.
+    #    >>> df.sample(frac=1.0, replace=False).rank(
+    #    ...    ascending=False, method='first', na_option='bottom'
+    #    ... ).sort_index() - 1
     return (
         ex_mtx.sample(frac=1.0, replace=False, axis=1, random_state=seed)
         .rank(axis=1, ascending=False, method="first", na_option="bottom")
@@ -50,15 +56,11 @@ def create_rankings(ex_mtx: pd.DataFrame, seed=None) -> pd.DataFrame:
     )
 
 
-# In [75]: %time create_rankings_df = (exp_matrix.sample(frac=1.0, replace=False, axis=1, random_state
-#     ...: =1)[exp_matrix.columns].rank(axis=1, ascending=False, method="first", na_option="bottom").a
-#     ...: stype(DTYPE) - 1)
+# In [75]: %time create_rankings_df = (exp_matrix.sample(frac=1.0, replace=False, axis=1, random_state=1)[exp_matrix.columns].rank(axis=1, ascending=False, method="first", na_option="bottom").astype(DTYPE) - 1)
 # CPU times: user 151 ms, sys: 4.02 ms, total: 155 ms
 # Wall time: 154 ms
 #
-# In [76]: %time cr_pl = pl.from_pandas(exp_matrix.T, include_index=True).select(pl.col(pl.Utf8), pl.c
-#     ...: ol(pl.Float64).fill_nan(None).rank(method="random", seed=5, descending=True,).add(-1).cast(
-#     ...: pl.UInt32))
+# In [76]: %time cr_pl = pl.from_pandas(exp_matrix.T, include_index=True).select(pl.col(pl.Utf8), pl.col(pl.Float64).fill_nan(None).rank(method="random", seed=5, descending=True,).add(-1).cast(pl.UInt32))
 # CPU times: user 193 ms, sys: 13.8 ms, total: 207 ms
 # Wall time: 52.2 ms
 
@@ -67,13 +69,14 @@ def derive_auc_threshold(ex_mtx: pd.DataFrame) -> pd.DataFrame:
     """
     Derive AUC thresholds for an expression matrix.
 
-    It is important to check that most cells have a substantial fraction of expressed/detected genes in the calculation of
-    the AUC.
+    It is important to check that most cells have a substantial fraction of
+    expressed/detected genes in the calculation of the AUC.
 
-    :param ex_mtx: The expression profile matrix. The rows should correspond to different cells, the columns to different
-        genes (n_cells x n_genes).
-    :return: A dataframe with AUC threshold for different quantiles over the number cells: a fraction of 0.01 designates
-        that when using this value as the AUC threshold for 99% of the cells all ranked genes used for AUC calculation will
+    :param ex_mtx: The expression profile matrix. The rows should correspond to
+        different cells, the columns to different genes (n_cells x n_genes).
+    :return: A dataframe with AUC threshold for different quantiles over the number
+        cells: a fraction of 0.01 designates that when using this value as the AUC
+        threshold for 99% of the cells all ranked genes used for AUC calculation will
         have had a detected expression in the single-cell experiment.
     """
     return (
@@ -98,7 +101,8 @@ def _enrichment(
         columns=genes,
         index=cells,
     )
-    # To avoid additional memory burden de resulting AUCs are immediately stored in the output sync. array.
+    # To avoid additional memory burden de resulting AUCs are immediately stored in the
+    # output array.
     result_mtx = np.frombuffer(auc_mtx.get_obj(), dtype="d")
     inc = len(cells)
     for idx, module in enumerate(modules):
@@ -120,9 +124,10 @@ def aucell4r(
 
     :param df_rnk: The rank matrix (n_cells x n_genes).
     :param signatures: The gene signatures or regulons.
-    :param auc_threshold: The fraction of the ranked genome to take into account for the calculation of the
-        Area Under the recovery Curve.
-    :param noweights: Should the weights of the genes part of a signature be used in calculation of enrichment?
+    :param auc_threshold: The fraction of the ranked genome to take into account for
+        the calculation of the Area Under the recovery Curve.
+    :param noweights: Should the weights of the genes part of a signature be used in
+        calculation of enrichment?
     :param normalize: Normalize the AUC values to a maximum of 1.0 per regulon.
     :param num_workers: The number of cores to use.
     :return: A dataframe with the AUCs (n_cells x n_modules).
@@ -141,15 +146,18 @@ def aucell4r(
         ).unstack("Regulon")
         aucs.columns = aucs.columns.droplevel(0)
     else:
-        # Decompose the rankings dataframe: the index and columns are shared with the child processes via pickling.
+        # Decompose the rankings dataframe: the index and columns are shared with the
+        # child processes via pickling.
         genes = df_rnk.columns.values
         cells = df_rnk.index.values
-        # The actual rankings are shared directly. This is possible because during a fork from a parent process the child
-        # process inherits the memory of the parent process. A RawArray is used instead of a synchronize Array because
+        # The actual rankings are shared directly. This is possible because during a
+        # fork from a parent process the child process inherits the memory of the
+        # parent process. A RawArray is used instead of a synchronize Array because
         # these rankings are read-only.
         shared_ro_memory_array = RawArray(DTYPE_C, mul(*df_rnk.shape))
         array = np.frombuffer(shared_ro_memory_array, dtype=DTYPE)
-        # Copy the contents of df_rank into this shared memory block using row-major ordering.
+        # Copy the contents of df_rank into this shared memory block using row-major
+        # ordering.
         array[:] = df_rnk.values.ravel(order="C")
 
         # The resulting AUCs are returned via a synchronize array.
@@ -208,9 +216,10 @@ def aucell(
 
     :param exp_mtx: The expression matrix (n_cells x n_genes).
     :param signatures: The gene signatures or regulons.
-    :param auc_threshold: The fraction of the ranked genome to take into account for the calculation of the
-        Area Under the recovery Curve.
-    :param noweights: Should the weights of the genes part of a signature be used in calculation of enrichment?
+    :param auc_threshold: The fraction of the ranked genome to take into account for
+        the calculation of the Area Under the recovery Curve.
+    :param noweights: Should the weights of the genes part of a signature be used in
+        calculation of enrichment?
     :param normalize: Normalize the AUC values to a maximum of 1.0 per regulon.
     :param num_workers: The number of cores to use.
     :return: A dataframe with the AUCs (n_cells x n_modules).
