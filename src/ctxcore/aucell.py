@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 import logging
 from ctypes import c_uint32
 from math import ceil
@@ -11,9 +9,10 @@ from typing import Sequence, Type
 import numpy as np
 import pandas as pd
 from boltons.iterutils import chunked
+from tqdm import tqdm
+
 from ctxcore.genesig import GeneSignature
 from ctxcore.recovery import enrichment4cells
-from tqdm import tqdm
 
 LOGGER = logging.getLogger(__name__)
 # To reduce the memory footprint of a ranking matrix we use unsigned 32bit integers which provides a range from 0
@@ -49,6 +48,7 @@ def create_rankings(ex_mtx: pd.DataFrame, seed=None) -> pd.DataFrame:
         .astype(DTYPE)
         - 1
     )
+
 
 # In [75]: %time create_rankings_df = (exp_matrix.sample(frac=1.0, replace=False, axis=1, random_state
 #     ...: =1)[exp_matrix.columns].rank(axis=1, ascending=False, method="first", na_option="bottom").a
@@ -102,9 +102,9 @@ def _enrichment(
     result_mtx = np.frombuffer(auc_mtx.get_obj(), dtype="d")
     inc = len(cells)
     for idx, module in enumerate(modules):
-        result_mtx[
-            offset + (idx * inc) : offset + ((idx + 1) * inc)
-        ] = enrichment4cells(df_rnk, module, auc_threshold).values.ravel(order="C")
+        result_mtx[offset + (idx * inc) : offset + ((idx + 1) * inc)] = (
+            enrichment4cells(df_rnk, module, auc_threshold).values.ravel(order="C")
+        )
 
 
 def aucell4r(
