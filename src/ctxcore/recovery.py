@@ -48,7 +48,7 @@ def derive_rank_cutoff(
     )
 
     # In the R implementation the cutoff is rounded.
-    rank_cutoff = int(round(auc_threshold * total_genes))
+    rank_cutoff = round(auc_threshold * total_genes)
     assert 0 < rank_cutoff <= rank_threshold, (
         f"An AUC threshold of {auc_threshold:f} corresponds to {rank_cutoff:d} top "
         f"ranked genes/regions in the database. Please increase the rank threshold "
@@ -317,7 +317,7 @@ def auc1d(ranking: np.ndarray, rank_cutoff: int, max_auc: float) -> float:
             np.full((1,), rank_cutoff, dtype=np.int_),
         )
     )
-    y = np.arange(x.size - 1) + 1.0
+    y = np.arange(1, x.size, dtype=np.float64)
     return np.sum(np.diff(x) * y) / max_auc
 
 
