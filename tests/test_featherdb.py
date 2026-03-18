@@ -1,15 +1,14 @@
 import pytest
-from pkg_resources import resource_filename
+from importlib.resources import files
 
 from ctxcore.genesig import GeneSignature
 from ctxcore.rnkdb import FeatherRankingDatabase as RankingDatabase
 
-TEST_DATABASE_FNAME = resource_filename(
-    "resources.tests",
+TEST_DATABASE_FNAME = str(files("resources.tests").joinpath(
     "hg19-tss-centered-10kb-10species.mc9nr.genes_vs_motifs.rankings.feather",
-)
+))
 TEST_DATABASE_NAME = "hg19-tss-centered-10kb-10species.mc9nr.genes_vs_motifs.rankings"
-TEST_SIGNATURE_FNAME = resource_filename("resources.tests", "c6.all.v6.1.symbols.gmt")
+TEST_SIGNATURE_FNAME = str(files("resources.tests").joinpath("c6.all.v6.1.symbols.gmt"))
 
 
 @pytest.fixture

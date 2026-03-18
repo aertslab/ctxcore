@@ -1,3 +1,4 @@
+attrs
 cytoolz
 diptest
 frozendict
@@ -6,6 +7,7 @@ numpy
 pandas>=0.24
 pyarrow>=8.0.0
 pyyaml
+setuptools>=82
 scipy
 scikit-learn>=0.22.2
 tqdm
